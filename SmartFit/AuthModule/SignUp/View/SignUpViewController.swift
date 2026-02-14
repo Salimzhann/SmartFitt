@@ -15,7 +15,7 @@ public protocol ISignUpViewController: AnyObject {
     func showLoading()
     func hideLoading()
     func showError(_ message: String)
-    func signUpSuccess()
+    func signUpSuccess(otpID: String)
 }
 
 
@@ -415,8 +415,10 @@ extension SignUpViewController: ISignUpViewController {
         buttonLoader.removeFromSuperview()
     }
     
-    func signUpSuccess() {
-        let vc = OtpViewController(email: emailTextField.text ?? "")
+    func signUpSuccess(otpID: String) {
+        let repository = SignUpRepository()
+        let presenter = OTPPresenter(otpID: otpID, repository: repository)
+        let vc = OtpViewController(presenter: presenter, email: emailTextField.text ?? "")
         navigationController?.pushViewController(vc, animated: true)
     }
     

@@ -8,6 +8,14 @@
 import UIKit
 import SnapKit
 
+public protocol IOtpViewController: AnyObject {
+    
+    func showLoading()
+    func hideLoading()
+    func showError(_ message: String)
+    func presentHomePage()
+}
+
 
 final class OtpViewController: UIViewController {
     
@@ -40,6 +48,7 @@ final class OtpViewController: UIViewController {
         }
         return view
     }()
+    private let buttonLoader = UIActivityIndicatorView(style: .medium)
     private lazy var verifyButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Verify", for: .normal)
@@ -62,8 +71,10 @@ final class OtpViewController: UIViewController {
     
     private var timer: Timer?
     private var remainingSeconds = 59
+    private let presenter: IOTPPresenter
     
-    init(email: String) {
+    init(presenter: IOTPPresenter, email: String) {
+        self.presenter = presenter
         emailLabel.text = email
         super.init(nibName: nil, bundle: nil)
     }
@@ -186,14 +197,58 @@ final class OtpViewController: UIViewController {
     
     @objc private func resendTapped() {
         resendLabel.gestureRecognizers?.removeAll()
-
-        // 🔥 тут твой запрос на бэк
-//        presenter.resendCode()
-
         startResendTimer()
+        
+        presenter.resendOTPTapped()
     }
     
     @objc private func verifyTapped() {
+        presenter.confirmTapped(code: otpView.getCode())
+    }
+}
+
+
+extension OtpViewController: IOtpViewController {
+    
+    func showLoading() {
+        verifyButton.isEnabled = false
+        verifyButton.alpha = 0.7
+        
+        verifyButton.setTitle("", for: .normal)
+        
+        buttonLoader.color = .white
+        buttonLoader.startAnimating()
+        
+        verifyButton.addSubview(buttonLoader)
+        buttonLoader.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
+    }
+    
+    func hideLoading() {
+        verifyButton.isEnabled = true
+        verifyButton.alpha = 1
+        
+        verifyButton.setTitle("Sign up", for: .normal)
+        
+        buttonLoader.stopAnimating()
+        buttonLoader.removeFromSuperview()
+    }
+    
+    func showError(_ message: String) {
+        view.endEditing(true)
+        
+        let alert = UIAlertController(
+            title: "Error",
+            message: message,
+            preferredStyle: .alert
+        )
+        
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
+    
+    func presentHomePage() {
         
     }
 }

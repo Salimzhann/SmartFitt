@@ -18,7 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     ) -> Bool {
 
         let window = UIWindow()
-        let viewController = OnboardingViewController()
+        let viewController = MainTabBarController()
         let navigationController = UINavigationController(rootViewController: viewController)
 
         window.rootViewController = navigationController

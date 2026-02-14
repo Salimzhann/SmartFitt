@@ -14,6 +14,7 @@ enum NetworkAPI {
     
     case register(email: String, password: String)
     case login(email: String, password: String)
+    case verifyCode(otpID: String, code: String)
 }
 
 
@@ -29,6 +30,8 @@ extension NetworkAPI: TargetType {
             return "/api/v1/auth/register"
         case .login:
             return "/api/v1/auth/login"
+        case .verifyCode:
+            return "/api/v1/auth/verify-code"
         }
     }
 
@@ -45,6 +48,14 @@ extension NetworkAPI: TargetType {
                 parameters: [
                     "email": email,
                     "password": password
+                ],
+                encoding: JSONEncoding.default
+            )
+        case let .verifyCode(otpID, code):
+            return .requestParameters(
+                parameters: [
+                    "otp_id": otpID,
+                    "code": code
                 ],
                 encoding: JSONEncoding.default
             )
