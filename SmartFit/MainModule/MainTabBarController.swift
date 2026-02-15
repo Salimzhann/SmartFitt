@@ -21,7 +21,7 @@ final class MainTabBarController: UITabBarController {
         let chatVC = ChatViewController()
         let caloriesVC = CaloriesViewController()
         let workoutsVC = WorkoutsViewController()
-
+        
         homeVC.title = "Home Page"
         caloriesVC.title = "Calories"
         workoutsVC.title = "Workouts"

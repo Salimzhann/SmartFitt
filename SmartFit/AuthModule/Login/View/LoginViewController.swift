@@ -186,7 +186,7 @@ final class LoginViewController: UIViewController {
             .map { [weak self] in self?.isValidEmail($0) ?? false }
 
         let passwordValidPublisher = passwordTextField.textPublisher
-            .map { $0.count >= 6 }
+            .map { $0.count >= 1 }
 
         Publishers
             .CombineLatest(
