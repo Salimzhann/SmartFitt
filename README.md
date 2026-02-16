@@ -1,1 +1,1 @@
-# SmartFitt
+# SmartFitness
