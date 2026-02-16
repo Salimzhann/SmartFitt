@@ -17,9 +17,18 @@ final class MainTabBarController: UITabBarController {
     }
 
     private func setupTabs() {
-        let homeVC = HomeViewController()
+        // Home Page
+        let homePresenter = HomePresenter()
+        let homeVC = HomeViewController(presenter: homePresenter)
+        homePresenter.view = homeVC
+        
+        //Chat Page
         let chatVC = ChatViewController()
+        
+        //Nutrition Page
         let caloriesVC = CaloriesViewController()
+        
+        // Workout Page
         let workoutsVC = WorkoutsViewController()
         
         homeVC.title = "Home Page"

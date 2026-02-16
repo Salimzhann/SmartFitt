@@ -20,53 +20,14 @@ protocol ILoginRepository {
 
 final class LoginRepository: ILoginRepository {
 
-    private let provider: MoyaProvider<NetworkAPI>
-
-    init(provider: MoyaProvider<NetworkAPI> = MoyaProvider<NetworkAPI>()) {
-        self.provider = provider
-    }
-
     func login(
         email: String,
         password: String,
         completion: @escaping (Result<LoginResponse, Error>) -> Void
     ) {
-        provider.request(.login(email: email, password: password)) { result in
-            switch result {
-                
-            case .success(let response):
-                if (200...299).contains(response.statusCode) {
-                    do {
-                        let decoded = try JSONDecoder().decode(LoginResponse.self, from: response.data)
-                        completion(.success(decoded))
-                    } catch {
-                        completion(.failure(error))
-                    }
-                } else {
-                    do {
-                        let apiError = try JSONDecoder().decode(APIErrorResponse.self, from: response.data)
-                        
-                        completion(.failure(NSError(
-                            domain: "AuthAPI",
-                            code: response.statusCode,
-                            userInfo: [NSLocalizedDescriptionKey: apiError.detail.error]
-                        )))
-                        
-                    } catch {
-                        print("Decoding error:", error)
-                        print(String(data: response.data, encoding: .utf8) ?? "no data")
-                        
-                        completion(.failure(NSError(
-                            domain: "AuthAPI",
-                            code: response.statusCode,
-                            userInfo: [NSLocalizedDescriptionKey: "Login failed"]
-                        )))
-                    }
-                }
-                
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
+        NetworkManager.shared.request(
+            .login(email: email, password: password),
+            completion: completion
+        )
     }
 }

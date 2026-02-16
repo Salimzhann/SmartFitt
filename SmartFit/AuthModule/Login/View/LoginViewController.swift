@@ -69,7 +69,7 @@ final class LoginViewController: UIViewController {
     private let buttonLoader = UIActivityIndicatorView(style: .medium)
     private lazy var confirmButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Sign up", for: .normal)
+        button.setTitle("Log In", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
         button.setTitleColor(.white, for: .normal)
         button.backgroundColor = .systemBlue
@@ -352,15 +352,13 @@ extension LoginViewController: ILoginViewController {
     }
     
     func loginSuccess() {
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate,
-              let window = appDelegate.window else {
+        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = scene.windows.first else {
             return
         }
         
-        let homeVC = HomeViewController()
-        let navController = UINavigationController(rootViewController: homeVC)
-        
-        window.rootViewController = navController
+        let tabBarController = MainTabBarController()
+        window.rootViewController = tabBarController
         window.makeKeyAndVisible()
     }
     

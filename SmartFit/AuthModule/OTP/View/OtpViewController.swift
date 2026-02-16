@@ -249,15 +249,13 @@ extension OtpViewController: IOtpViewController {
     }
     
     func presentHomePage() {
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate,
-              let window = appDelegate.window else {
+        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = scene.windows.first else {
             return
         }
         
-        let homeVC = HomeViewController()
-        let navController = UINavigationController(rootViewController: homeVC)
-        
-        window.rootViewController = navController
+        let tabBarController = MainTabBarController()
+        window.rootViewController = tabBarController
         window.makeKeyAndVisible()
     }
 }

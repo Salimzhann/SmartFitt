@@ -8,16 +8,39 @@
 import UIKit
 import SnapKit
 
-
-final class HomeViewController: UIViewController {
+public protocol IHomeViewController: AnyObject {
     
-    private let profileView = ProfileView()
+}
+
+
+final class HomeViewController: UIViewController, IHomeViewController {
+    
+    private lazy var profileView: ProfileView = {
+       let view = ProfileView()
+        view.onLogOut = { [weak presenter] in
+            presenter?.logoutTapped()
+        }
+        return view
+    }()
+    
+    let presenter: IHomePresenter?
+    
+    init(presenter: IHomePresenter?) {
+        self.presenter = presenter
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        assertionFailure("init(coder:) has not been implemented")
+        return nil
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.setNavigationBarHidden(true, animated: false)
         setupViews()
         profileView.configure(image: .defaultAvatarIc, username: "Manas S.", email: "msalimzhan@icloud.com")
+        profileView.isUserInteractionEnabled = true
     }
     
     private func setupViews() {

@@ -38,17 +38,14 @@ final class LoginPresenter: ILoginPresenter {
                 
                 switch result {
                 case .success(let response):
-                    view?.hideLoading()
-                    view?.loginSuccess()
-                    
                     TokenStorage.shared.save(
                         accessToken: response.accessToken,
                         refreshToken: response.refreshToken
                     )
+                    view?.loginSuccess()
                     
                 case .failure(let error):
                     print(error.localizedDescription)
-                    view?.hideLoading()
                     view?.showError(error.localizedDescription)
                 }
             }
