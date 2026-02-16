@@ -35,7 +35,6 @@ final class LoginRepository: ILoginRepository {
             switch result {
                 
             case .success(let response):
-                
                 if (200...299).contains(response.statusCode) {
                     do {
                         let decoded = try JSONDecoder().decode(LoginResponse.self, from: response.data)
@@ -44,13 +43,19 @@ final class LoginRepository: ILoginRepository {
                         completion(.failure(error))
                     }
                 } else {
-                    if let apiError = try? JSONDecoder().decode(APIErrorResponse.self, from: response.data) {
+                    do {
+                        let apiError = try JSONDecoder().decode(APIErrorResponse.self, from: response.data)
+                        
                         completion(.failure(NSError(
                             domain: "AuthAPI",
                             code: response.statusCode,
-                            userInfo: [NSLocalizedDescriptionKey: apiError.detail]
+                            userInfo: [NSLocalizedDescriptionKey: apiError.detail.error]
                         )))
-                    } else {
+                        
+                    } catch {
+                        print("Decoding error:", error)
+                        print(String(data: response.data, encoding: .utf8) ?? "no data")
+                        
                         completion(.failure(NSError(
                             domain: "AuthAPI",
                             code: response.statusCode,

@@ -16,21 +16,25 @@ protocol ISignUpRepository {
         completion: @escaping (Result<RegistrationResponse, Error>) -> Void
     )
     func verifyOTP(
-        otpID: String,
+        otpID: Int,
         code: String,
         completion: @escaping (Result<LoginResponse, Error>) -> Void
+    )
+    func resendCode(
+        verificationID: Int,
+        completion: @escaping (Result<RegistrationResponse, Error>) -> Void
     )
 }
 
 
 final class SignUpRepository: ISignUpRepository {
-
+    
     private let provider: MoyaProvider<NetworkAPI>
-
+    
     init(provider: MoyaProvider<NetworkAPI> = MoyaProvider<NetworkAPI>()) {
         self.provider = provider
     }
-
+    
     func register(
         email: String,
         password: String,
@@ -47,13 +51,19 @@ final class SignUpRepository: ISignUpRepository {
                         completion(.failure(error))
                     }
                 } else {
-                    if let apiError = try? JSONDecoder().decode(APIErrorResponse.self, from: response.data) {
+                    do {
+                        let apiError = try JSONDecoder().decode(APIErrorResponse.self, from: response.data)
+                        
                         completion(.failure(NSError(
                             domain: "AuthAPI",
                             code: response.statusCode,
-                            userInfo: [NSLocalizedDescriptionKey: apiError.detail]
+                            userInfo: [NSLocalizedDescriptionKey: apiError.detail.error]
                         )))
-                    } else {
+                        
+                    } catch {
+                        print("Decoding error:", error)
+                        print(String(data: response.data, encoding: .utf8) ?? "no data")
+                        
                         completion(.failure(NSError(
                             domain: "AuthAPI",
                             code: response.statusCode,
@@ -69,7 +79,7 @@ final class SignUpRepository: ISignUpRepository {
     }
     
     func verifyOTP(
-        otpID: String,
+        otpID: Int,
         code: String,
         completion: @escaping (Result<LoginResponse, Error>) -> Void
     ) {
@@ -84,13 +94,19 @@ final class SignUpRepository: ISignUpRepository {
                         completion(.failure(error))
                     }
                 } else {
-                    if let apiError = try? JSONDecoder().decode(APIErrorResponse.self, from: response.data) {
+                    do {
+                        let apiError = try JSONDecoder().decode(APIErrorResponse.self, from: response.data)
+                        
                         completion(.failure(NSError(
                             domain: "AuthAPI",
                             code: response.statusCode,
-                            userInfo: [NSLocalizedDescriptionKey: apiError.detail]
+                            userInfo: [NSLocalizedDescriptionKey: apiError.detail.error]
                         )))
-                    } else {
+                        
+                    } catch {
+                        print("Decoding error:", error)
+                        print(String(data: response.data, encoding: .utf8) ?? "no data")
+                        
                         completion(.failure(NSError(
                             domain: "AuthAPI",
                             code: response.statusCode,
@@ -98,6 +114,50 @@ final class SignUpRepository: ISignUpRepository {
                         )))
                     }
                 }
+                
+                
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    func resendCode(
+        verificationID: Int,
+        completion: @escaping (Result<RegistrationResponse, Error>) -> Void
+    ) {
+        provider.request(.resendCode(verificationID: verificationID)) { result in
+            switch result {
+            case .success(let response):
+                if (200...299).contains(response.statusCode) {
+                    do {
+                        let decoded = try JSONDecoder().decode(RegistrationResponse.self, from: response.data)
+                        completion(.success(decoded))
+                    } catch {
+                        completion(.failure(error))
+                    }
+                } else {
+                    do {
+                        let apiError = try JSONDecoder().decode(APIErrorResponse.self, from: response.data)
+                        
+                        completion(.failure(NSError(
+                            domain: "AuthAPI",
+                            code: response.statusCode,
+                            userInfo: [NSLocalizedDescriptionKey: apiError.detail.error]
+                        )))
+                        
+                    } catch {
+                        print("Decoding error:", error)
+                        print(String(data: response.data, encoding: .utf8) ?? "no data")
+                        
+                        completion(.failure(NSError(
+                            domain: "AuthAPI",
+                            code: response.statusCode,
+                            userInfo: [NSLocalizedDescriptionKey: "Login failed"]
+                        )))
+                    }
+                }
+                
                 
             case .failure(let error):
                 completion(.failure(error))

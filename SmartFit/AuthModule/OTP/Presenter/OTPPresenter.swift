@@ -18,9 +18,9 @@ final class OTPPresenter: IOTPPresenter {
     
     weak var view: IOtpViewController?
     private let repository: ISignUpRepository
-    private let otpID: String
+    private let otpID: Int
     
-    init(otpID: String, repository: ISignUpRepository) {
+    init(otpID: Int, repository: ISignUpRepository) {
         self.repository = repository
         self.otpID = otpID
     }
@@ -31,10 +31,18 @@ final class OTPPresenter: IOTPPresenter {
             .verifyOTP(otpID: otpID, code: code) { [weak self] result in
                 switch result {
                 case .success(let result):
+                    print(result)
+                    
+                    TokenStorage.shared.save(
+                        accessToken: result.accessToken,
+                        refreshToken: result.refreshToken
+                    )
+                    
                     self?.view?.hideLoading()
                     self?.view?.presentHomePage()
                     
                 case .failure(let error):
+                    print("error in otp part: ", error)
                     self?.view?.hideLoading()
                     self?.view?.showError(error.localizedDescription)
                 }
@@ -42,6 +50,18 @@ final class OTPPresenter: IOTPPresenter {
     }
     
     func resendOTPTapped() {
+        view?.showLoading()
         
+        repository
+            .resendCode(verificationID: otpID) { [weak self] result in
+                switch result {
+                case .success(_):
+                    self?.view?.hideLoading()
+                    
+                case .failure(let error):
+                    self?.view?.hideLoading()
+                    self?.view?.showError(error.localizedDescription)
+                }
+            }
     }
 }

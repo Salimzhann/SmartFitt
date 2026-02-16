@@ -15,7 +15,7 @@ public protocol ISignUpViewController: AnyObject {
     func showLoading()
     func hideLoading()
     func showError(_ message: String)
-    func signUpSuccess(otpID: String)
+    func signUpSuccess(otpID: Int)
 }
 
 
@@ -322,7 +322,7 @@ final class SignUpViewController: UIViewController {
     
     @objc private func termsButtonTapped() {
         guard let url = URL(
-            string: "https://www.termsfeed.com/blog/sample-terms-and-conditions-template/"
+            string: "https://terms-and-conditions-mobile.vercel.app/"
         ) else { return }
         
         let safariVC = SFSafariViewController(url: url)
@@ -415,10 +415,11 @@ extension SignUpViewController: ISignUpViewController {
         buttonLoader.removeFromSuperview()
     }
     
-    func signUpSuccess(otpID: String) {
+    func signUpSuccess(otpID: Int) {
         let repository = SignUpRepository()
         let presenter = OTPPresenter(otpID: otpID, repository: repository)
         let vc = OtpViewController(presenter: presenter, email: emailTextField.text ?? "")
+        presenter.view = vc
         navigationController?.pushViewController(vc, animated: true)
     }
     

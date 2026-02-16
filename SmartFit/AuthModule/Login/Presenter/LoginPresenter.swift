@@ -33,18 +33,24 @@ final class LoginPresenter: ILoginPresenter {
                 email: email,
                 password: password
             ) { [weak self] result in
-            self?.view?.hideLoading()
-            
-            switch result {
-            case .success(let response):
-                print("ACCESS:", response.accessToken)
-                print("REFRESH:", response.refreshToken)
-                self?.view?.loginSuccess()
+                guard let self else { return }
+                view?.hideLoading()
                 
-            case .failure(let error):
-                print(error.localizedDescription)
-                self?.view?.showError(error.localizedDescription)
+                switch result {
+                case .success(let response):
+                    view?.hideLoading()
+                    view?.loginSuccess()
+                    
+                    TokenStorage.shared.save(
+                        accessToken: response.accessToken,
+                        refreshToken: response.refreshToken
+                    )
+                    
+                case .failure(let error):
+                    print(error.localizedDescription)
+                    view?.hideLoading()
+                    view?.showError(error.localizedDescription)
+                }
             }
-        }
     }
 }

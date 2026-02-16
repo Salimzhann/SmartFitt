@@ -8,21 +8,11 @@
 import Foundation
 
 
-public enum APIError: LocalizedError {
-    case server(message: String)
-    case unknown
-
-    public var errorDescription: String? {
-        switch self {
-        case .server(let message):
-            return message
-        case .unknown:
-            return "Something went wrong"
-        }
-    }
+struct APIErrorResponse: Decodable {
+    let detail: APIErrorDetail
 }
 
 
-public struct APIErrorResponse: Decodable {
-    let detail: String
+struct APIErrorDetail: Decodable {
+    let error: String
 }

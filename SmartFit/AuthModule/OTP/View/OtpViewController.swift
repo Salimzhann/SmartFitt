@@ -70,7 +70,7 @@ final class OtpViewController: UIViewController {
     }()
     
     private var timer: Timer?
-    private var remainingSeconds = 59
+    private var remainingSeconds = 119
     private let presenter: IOTPPresenter
     
     init(presenter: IOTPPresenter, email: String) {
@@ -136,7 +136,7 @@ final class OtpViewController: UIViewController {
     }
     
     private func startResendTimer() {
-        remainingSeconds = 59
+        remainingSeconds = 119
         updateTimerText()
 
         timer?.invalidate()
@@ -249,6 +249,15 @@ extension OtpViewController: IOtpViewController {
     }
     
     func presentHomePage() {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate,
+              let window = appDelegate.window else {
+            return
+        }
         
+        let homeVC = HomeViewController()
+        let navController = UINavigationController(rootViewController: homeVC)
+        
+        window.rootViewController = navController
+        window.makeKeyAndVisible()
     }
 }

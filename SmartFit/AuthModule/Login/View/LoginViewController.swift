@@ -352,7 +352,16 @@ extension LoginViewController: ILoginViewController {
     }
     
     func loginSuccess() {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate,
+              let window = appDelegate.window else {
+            return
+        }
         
+        let homeVC = HomeViewController()
+        let navController = UINavigationController(rootViewController: homeVC)
+        
+        window.rootViewController = navController
+        window.makeKeyAndVisible()
     }
     
     func showError(_ message: String) {

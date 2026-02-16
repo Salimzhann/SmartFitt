@@ -10,11 +10,12 @@ import Foundation
 
 struct RegistrationResponse: Decodable {
     
-    let otpID: String
+    let verificationID: Int
+    let resendTime: Int?
     
     enum CodingKeys: String, CodingKey {
         
-        case otpID = "otp_id"
+        case verificationID = "verification_id"
+        case resendTime = "resend_in"
     }
-        
 }

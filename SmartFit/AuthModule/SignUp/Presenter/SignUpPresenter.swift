@@ -36,7 +36,7 @@ final class SignUpPresenter: ISignUpPresenter {
             
             switch result {
             case .success(let response):
-                self?.view?.signUpSuccess(otpID: response.otpID)
+                self?.view?.signUpSuccess(otpID: response.verificationID)
                 
             case .failure(let error):
                 print(error.localizedDescription)
