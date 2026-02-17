@@ -82,7 +82,6 @@ final class NetworkManager {
     }
 
     // MARK: - Refresh
-
     private func refreshIfNeeded() {
         guard !isRefreshing else { return }
         guard let refreshToken = TokenStorage.shared.getRefreshToken() else {
@@ -91,29 +90,31 @@ final class NetworkManager {
         }
 
         isRefreshing = true
-
         provider.request(.refresh(refreshToken: refreshToken)) { [weak self] result in
             guard let self else { return }
             self.isRefreshing = false
 
             switch result {
             case .success(let response):
-                guard (200...299).contains(response.statusCode),
-                      let decoded = try? JSONDecoder().decode(LoginResponse.self, from: response.data)
+                guard
+                    (200...299).contains(response.statusCode),
+                    let decoded = try? JSONDecoder().decode(RefreshResponse.self, from: response.data)
                 else {
+                    print("REFRESH BODY:", String(data: response.data, encoding: .utf8) ?? "no body")
                     self.logout()
                     return
                 }
 
                 TokenStorage.shared.save(
                     accessToken: decoded.accessToken,
-                    refreshToken: decoded.refreshToken
+                    refreshToken: TokenStorage.shared.getRefreshToken() ?? ""
                 )
 
                 self.retryQueue.forEach { $0() }
                 self.retryQueue.removeAll()
 
-            case .failure:
+            case .failure(let error):
+                print(error.response, error.errorCode, error)
                 self.logout()
             }
         }

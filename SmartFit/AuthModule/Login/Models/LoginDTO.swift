@@ -13,7 +13,7 @@ struct LoginRequest: Encodable {
 }
 
 
-//MARK: - Repsonses
+//MARK: - Login Repsonse
 struct LoginResponse: Decodable {
     
     let accessToken: String
@@ -24,6 +24,17 @@ struct LoginResponse: Decodable {
         
         case accessToken = "access_token"
         case refreshToken = "refresh_token"
+        case tokenType = "token_type"
+    }
+}
+
+// MARK: - Refresh Reposponse
+struct RefreshResponse: Decodable {
+    let accessToken: String
+    let tokenType: String
+
+    enum CodingKeys: String, CodingKey {
+        case accessToken = "access_token"
         case tokenType = "token_type"
     }
 }

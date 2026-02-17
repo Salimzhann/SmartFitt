@@ -10,6 +10,8 @@ import SnapKit
 
 public protocol IHomeViewController: AnyObject {
     
+    func showError(_ message: String)
+    func updateProfile(with viewModel: MeResponse)
 }
 
 
@@ -37,9 +39,10 @@ final class HomeViewController: UIViewController, IHomeViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        presenter?.viewDidLoad()
         navigationController?.setNavigationBarHidden(true, animated: false)
         setupViews()
-        profileView.configure(image: .defaultAvatarIc, username: "Manas S.", email: "msalimzhan@icloud.com")
+        profileView.showSkeleton()
         profileView.isUserInteractionEnabled = true
     }
     
@@ -51,5 +54,32 @@ final class HomeViewController: UIViewController, IHomeViewController {
             make.top.equalToSuperview().offset(44)
             make.leading.trailing.equalToSuperview()
         }
+    }
+    
+    
+    func showError(_ message: String) {
+        view.endEditing(true)
+        
+        let alert = UIAlertController(
+            title: "Error",
+            message: message,
+            preferredStyle: .alert
+        )
+        
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
+    
+    func updateProfile(with viewModel: MeResponse) {
+        let date = Date(timeIntervalSince1970: TimeInterval(viewModel.loggedInAt))
+        let formatter = DateFormatter()
+        formatter.locale = Locale.current
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+
+        let formatted = formatter.string(from: date)
+        
+        profileView.configure(image: .defaultAvatarIc, username: viewModel.email, email: formatted)
+        profileView.hideSkeleton()
     }
 }

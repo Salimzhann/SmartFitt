@@ -12,11 +12,15 @@ import Foundation
 
 enum NetworkAPI {
 
+    // Auth Endpoint
     case register(email: String, password: String)
     case login(email: String, password: String)
     case verifyCode(otpID: Int, code: String)
     case resendCode(verificationID: Int)
     case refresh(refreshToken: String)
+    
+    // Home Page Endpoint
+    case infoMe
 }
 
 extension NetworkAPI: TargetType {
@@ -27,16 +31,26 @@ extension NetworkAPI: TargetType {
 
     var path: String {
         switch self {
+            
+            // Auth Endpoint
         case .register:                 return "/api/v1/auth/register"
         case .login:                    return "/api/v1/auth/login"
         case .verifyCode:               return "/api/v1/auth/register/otp/confirm"
         case .resendCode:               return "/api/v1/auth/register/otp/resend"
         case .refresh:                  return "/api/v1/auth/refresh"
+            
+            // Home Page Endpoint
+        case .infoMe:                   return "/api/v1/auth/me"
         }
     }
 
     var method: Moya.Method {
-        .post
+        switch self {
+        case .infoMe:
+            return .get
+        default:
+            return .post
+        }
     }
 
     var task: Task {
@@ -67,7 +81,7 @@ extension NetworkAPI: TargetType {
                 ],
                 encoding: JSONEncoding.default
             )
-
+            
         case let .refresh(refreshToken):
             return .requestParameters(
                 parameters: [
@@ -75,6 +89,9 @@ extension NetworkAPI: TargetType {
                 ],
                 encoding: JSONEncoding.default
             )
+            
+        case .infoMe:
+            return .requestPlain
         }
     }
 
@@ -96,6 +113,9 @@ extension NetworkAPI {
              .resendCode,
              .refresh:
             return true
+            
+        default:
+            return false
         }
     }
 }

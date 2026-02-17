@@ -18,7 +18,8 @@ final class MainTabBarController: UITabBarController {
 
     private func setupTabs() {
         // Home Page
-        let homePresenter = HomePresenter()
+        let repository = HomeRepository()
+        let homePresenter = HomePresenter(repository: repository)
         let homeVC = HomeViewController(presenter: homePresenter)
         homePresenter.view = homeVC
         
