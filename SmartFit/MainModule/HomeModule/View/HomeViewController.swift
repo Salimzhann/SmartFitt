@@ -24,6 +24,7 @@ final class HomeViewController: UIViewController, IHomeViewController {
         }
         return view
     }()
+    private let waterIntakeView = WaterCounterView()
     
     let presenter: IHomePresenter?
     
@@ -53,6 +54,12 @@ final class HomeViewController: UIViewController, IHomeViewController {
         profileView.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(44)
             make.leading.trailing.equalToSuperview()
+        }
+        
+        view.addSubview(waterIntakeView)
+        waterIntakeView.snp.makeConstraints { make in
+            make.top.equalTo(profileView.snp.bottom).offset(24)
+            make.leading.trailing.equalToSuperview().inset(20)
         }
     }
     

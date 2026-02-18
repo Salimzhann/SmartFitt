@@ -114,7 +114,7 @@ final class NetworkManager {
                 self.retryQueue.removeAll()
 
             case .failure(let error):
-                print(error.response, error.errorCode, error)
+                print(error.errorCode, error)
                 self.logout()
             }
         }
