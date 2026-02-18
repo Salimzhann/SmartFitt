@@ -45,7 +45,7 @@ final class TokenStorage {
                 kSecValueData as String: data
             ]
             
-            SecItemDelete(query as CFDictionary) // Delete old value if exists
+            SecItemDelete(query as CFDictionary)
             let status = SecItemAdd(query as CFDictionary, nil)
             
             if status != errSecSuccess {

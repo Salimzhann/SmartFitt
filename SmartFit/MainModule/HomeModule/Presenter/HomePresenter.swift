@@ -42,6 +42,33 @@ final class HomePresenter: IHomePresenter {
     
     func viewDidLoad() {
         fetchMeData()
+        
+        view?.habits = [
+            HabitChallengeViewModel(
+                id: 1,
+                title: "Sleep 8 hours every night",
+                buttonBackgroundColor: .systemBlue,
+                buttonTitle: "Start",
+                backgroundColor: .softBlue.withAlphaComponent(0.2),
+                image: .nightHabbitIc
+            ),
+            HabitChallengeViewModel(
+                id: 2,
+                title: "No fast food for 7 days",
+                buttonBackgroundColor: .systemOrange,
+                buttonTitle: "Start",
+                backgroundColor: .softOrange.withAlphaComponent(0.2),
+                image: .foodHabbitIc
+            ),
+            HabitChallengeViewModel(
+                id: 3,
+                title: "Do 10,000 steps every day",
+                buttonBackgroundColor: .systemBlue,
+                buttonTitle: "Start",
+                backgroundColor: .softBlue.withAlphaComponent(0.2),
+                image: .runHabbitIc
+            )
+        ]
     }
     
     private func fetchMeData() {
