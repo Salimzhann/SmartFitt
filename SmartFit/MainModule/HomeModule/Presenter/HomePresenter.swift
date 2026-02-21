@@ -43,32 +43,53 @@ final class HomePresenter: IHomePresenter {
     func viewDidLoad() {
         fetchMeData()
         
-        view?.habits = [
+        var habits = [
             HabitChallengeViewModel(
                 id: 1,
                 title: "Sleep 8 hours every night",
-                buttonBackgroundColor: .systemBlue,
+                activatedTitle: "Sleep 8 hours",
                 buttonTitle: "Start",
                 backgroundColor: .softBlue.withAlphaComponent(0.2),
+                buttonBackgroundColor: .systemBlue,
                 image: .nightHabbitIc
             ),
             HabitChallengeViewModel(
                 id: 2,
                 title: "No fast food for 7 days",
-                buttonBackgroundColor: .systemOrange,
+                activatedTitle: "No fast food",
                 buttonTitle: "Start",
                 backgroundColor: .softOrange.withAlphaComponent(0.2),
+                buttonBackgroundColor: .systemOrange,
                 image: .foodHabbitIc
             ),
             HabitChallengeViewModel(
                 id: 3,
                 title: "Do 10,000 steps every day",
-                buttonBackgroundColor: .systemBlue,
+                activatedTitle: "Do 10,000 steps",
                 buttonTitle: "Start",
                 backgroundColor: .softBlue.withAlphaComponent(0.2),
+                buttonBackgroundColor: .systemBlue,
                 image: .runHabbitIc
             )
         ]
+        
+        let stored = HabitStorage.load()
+
+           for i in habits.indices {
+               let id = habits[i].id
+               guard let saved = stored[id] else { continue }
+
+               habits[i].isActive = saved.0
+               habits[i].markedDays = saved.1
+               habits[i].startDate = saved.2
+
+               // ⛔️ если неделя прошла — деактивируем
+               if habits[i].isWeekExpired || habits[i].isCompleted {
+                   habits[i].isActive = false
+               }
+           }
+
+           view?.habits = habits
     }
     
     private func fetchMeData() {

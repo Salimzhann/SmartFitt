@@ -5,7 +5,6 @@
 //  Created by Manas Salimzhan on 09.02.2026.
 //
 
-import Moya
 import Foundation
 
 protocol ILoginRepository {

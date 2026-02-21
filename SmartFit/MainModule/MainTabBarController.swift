@@ -29,8 +29,12 @@ final class MainTabBarController: UITabBarController {
         //Nutrition Page
         let caloriesVC = CaloriesViewController()
         
-        // Workout Page
+        // Workout Pag
+        let workoutRepository = WorkoutRepository()
+        let workoutPresenter = WorkoutsPresenter(repository: workoutRepository)
         let workoutsVC = WorkoutsViewController()
+        workoutsVC.presenter = workoutPresenter
+        workoutPresenter.view = workoutsVC
         
         homeVC.title = "Home Page"
         caloriesVC.title = "Calories"

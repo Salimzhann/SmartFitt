@@ -40,10 +40,6 @@ final class HomeViewController: UIViewController, IHomeViewController {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         layout.minimumLineSpacing = 16
-        layout.itemSize = CGSize(
-            width: UIScreen.main.bounds.width - 40,
-            height: 260
-        )
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
         cv.backgroundColor = .clear
         cv.isScrollEnabled = false
@@ -169,7 +165,11 @@ final class HomeViewController: UIViewController, IHomeViewController {
 }
 
 extension HomeViewController: UICollectionViewDelegateFlowLayout {
-    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let item = habits[indexPath.row]
+        let height: CGFloat = item.isActive ? 160 : 260
+        return CGSize(width: UIScreen.main.bounds.width - 40, height: height)
+    }
 }
 
 extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSource {
@@ -183,11 +183,42 @@ extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSour
             withReuseIdentifier: HabitChallengeCell.reuseId,
             for: indexPath
         ) as! HabitChallengeCell
-        
-        cell.onActionTap = { [weak self] in
-            
+
+        cell.onStartTap = { [weak self] in
+            guard let self else { return }
+
+            var habit = self.habits[indexPath.item]
+            habit.isActive = true
+            habit.startDate = HabitChallengeViewModel.todayString()
+            habit.markedDays = []
+
+            self.habits[indexPath.item] = habit
+            HabitStorage.save(self.habits)
+
+            self.collectionView.reloadItems(at: [indexPath])
+            self.updateCollectionHeight()
         }
-        
+
+        cell.onMarkTodayTap = { [weak self] in
+            guard let self else { return }
+
+            var habit = self.habits[indexPath.item]
+            let today = HabitChallengeViewModel.todayString()
+
+            guard !habit.isMarkedToday else { return }
+
+            habit.markedDays.append(today)
+
+            if habit.isCompleted {
+                habit.isActive = false
+            }
+
+            self.habits[indexPath.item] = habit
+            HabitStorage.save(self.habits)
+
+            self.collectionView.reloadItems(at: [indexPath])
+        }
+
         cell.configure(with: habits[indexPath.item])
         return cell
     }
