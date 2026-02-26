@@ -82,14 +82,29 @@ extension ExercisesViewController: UICollectionViewDataSource, UICollectionViewD
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        exerciseItems?.count ?? 0
+        exerciseItems?.count ?? 4
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WorkoutCell.identifier, for: indexPath) as! WorkoutCell
-        guard let exerciseItems else { return cell }
+        guard let exerciseItems else {
+            cell.configureSkeleton()
+            return cell
+        }
         
         cell.configureCell(item: exerciseItems[indexPath.row], style: .exercise)
         return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let item = exerciseItems?[indexPath.row] else { return }
+        
+        let repository = WorkoutRepository()
+        let presenter = ExerciseDetailsPresenter(repository: repository, exerciseID: item.id)
+        let viewController = ExerciseDetailsViewController()
+        viewController.presenter = presenter
+        presenter.view = viewController
+        
+        navigationController?.pushViewController(viewController, animated: true)
     }
 }

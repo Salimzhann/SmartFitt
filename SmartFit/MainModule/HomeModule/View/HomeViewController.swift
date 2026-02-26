@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import PanModal
 
 public protocol IHomeViewController: AnyObject {
     
@@ -217,6 +218,11 @@ extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSour
             HabitStorage.save(self.habits)
 
             self.collectionView.reloadItems(at: [indexPath])
+        }
+        
+        cell.onInformerTap = { [weak self] in
+            let bottomSheet = InformerBottomSheetView()
+            self?.presentPanModal(bottomSheet)
         }
 
         cell.configure(with: habits[indexPath.item])

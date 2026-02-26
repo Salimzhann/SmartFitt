@@ -21,6 +21,11 @@ enum NetworkAPI {
     
     // Home Page Endpoint
     case infoMe
+    
+    //Exercises Page
+    case fetchWorkoutsList
+    case fetchExercisesList(id: Int)
+    case fetchExerciseDetails(id: Int)
 }
 
 extension NetworkAPI: TargetType {
@@ -33,20 +38,28 @@ extension NetworkAPI: TargetType {
         switch self {
             
             // Auth Endpoint
-        case .register:                 return "/api/v1/auth/register"
-        case .login:                    return "/api/v1/auth/login"
-        case .verifyCode:               return "/api/v1/auth/register/otp/confirm"
-        case .resendCode:               return "/api/v1/auth/register/otp/resend"
-        case .refresh:                  return "/api/v1/auth/refresh"
+        case .register:                                     return "/api/v1/auth/register"
+        case .login:                                        return "/api/v1/auth/login"
+        case .verifyCode:                                   return "/api/v1/auth/register/otp/confirm"
+        case .resendCode:                                   return "/api/v1/auth/register/otp/resend"
+        case .refresh:                                      return "/api/v1/auth/refresh"
             
             // Home Page Endpoint
-        case .infoMe:                   return "/api/v1/auth/me"
+        case .infoMe:                                       return "/api/v1/auth/me"
+            
+            // Exercises Page
+        case .fetchWorkoutsList:                            return "/api/v1/body-areas"
+        case .fetchExercisesList(let id):                   return "/api/v1/body-areas/\(id)/exercises"
+        case .fetchExerciseDetails(id: let id):             return "/api/v1/exercises/\(id)/details"
         }
     }
 
     var method: Moya.Method {
         switch self {
-        case .infoMe:
+        case .infoMe,
+             .fetchWorkoutsList,
+             .fetchExercisesList,
+             .fetchExerciseDetails:
             return .get
         default:
             return .post
@@ -90,7 +103,10 @@ extension NetworkAPI: TargetType {
                 encoding: JSONEncoding.default
             )
             
-        case .infoMe:
+        case .infoMe,
+             .fetchWorkoutsList,
+             .fetchExercisesList,
+             .fetchExerciseDetails:
             return .requestPlain
         }
     }

@@ -23,27 +23,15 @@ final class WorkoutsPresenter: IWorkoutsPresenter {
     }
     
     func viewDidLoad() {
-        view?.workoutItems = [
-            WorkoutResponse(
-                title: "Chest",
-                image: .chestIc
-            ),
-            WorkoutResponse(
-                title: "Chest",
-                image: .chestIc
-            ),
-            WorkoutResponse(
-                title: "Chest",
-                image: .chestIc
-            ),
-            WorkoutResponse(
-                title: "Chest",
-                image: .chestIc
-            ),
-            WorkoutResponse(
-                title: "Chest",
-                image: .chestIc
-            )
-        ]
+        repository.fetchWorkoutList { result in
+            switch result {
+            case .success(let response):
+                DispatchQueue.main.async {
+                    self.view?.workoutItems = response
+                }
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        }
     }
 }

@@ -46,10 +46,12 @@ final class HabitChallengeCell: UICollectionViewCell {
         iv.contentMode = .scaleAspectFill
         return iv
     }()
-    private let informerImageView: UIImageView = {
+    private lazy var informerImageView: UIImageView = {
         let iv = UIImageView(image: UIImage(systemName: "exclamationmark.circle"))
         iv.contentMode = .scaleAspectFit
         iv.tintColor = .gray
+        iv.isUserInteractionEnabled = true
+        iv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(informerTapped)))
         return iv
     }()
     private let activeTitleLabel: UILabel = {
@@ -94,6 +96,7 @@ final class HabitChallengeCell: UICollectionViewCell {
     // MARK: - Callbacks
     var onStartTap: (() -> Void)?
     var onMarkTodayTap: (() -> Void)?
+    var onInformerTap: (() -> Void)?
 
     // MARK: - Init
     override init(frame: CGRect) {
@@ -220,6 +223,10 @@ final class HabitChallengeCell: UICollectionViewCell {
             startButton.setTitle(model.buttonTitle, for: .normal)
             startButton.backgroundColor = model.buttonBackgroundColor
         }
+    }
+    
+    @objc private func informerTapped() {
+        onInformerTap?()
     }
 
     // MARK: - Actions

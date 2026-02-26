@@ -16,34 +16,24 @@ public protocol IExercisesPresenter: AnyObject {
 final class ExercisesPresenter: IExercisesPresenter {
     
     private let repository: IWorkoutRepository
+    private let workoutId: Int
     weak var view: IExercisesView?
     
-    init(repository: IWorkoutRepository) {
+    init(repository: IWorkoutRepository, workoutId: Int) {
         self.repository = repository
+        self.workoutId = workoutId
     }
     
     func viewDidLoad() {
-        view?.exerciseItems = [
-            WorkoutResponse(
-                title: "Chest",
-                image: .chestIc
-            ),
-            WorkoutResponse(
-                title: "Chest",
-                image: .chestIc
-            ),
-            WorkoutResponse(
-                title: "Chest",
-                image: .chestIc
-            ),
-            WorkoutResponse(
-                title: "Chest",
-                image: .chestIc
-            ),
-            WorkoutResponse(
-                title: "Chest",
-                image: .chestIc
-            )
-        ]
+        repository.fetchExercisesList(workoutID: workoutId) { [weak self] result in
+            switch result {
+            case .success(let response):
+                self?.view?.exerciseItems = response
+                self?.view?.reloadData()
+            case .failure(let error):
+                print(error.localizedDescription)
+                break
+            }
+        }
     }
 }

@@ -11,7 +11,7 @@ import SnapKit
 public protocol IWorkoutsView: AnyObject {
     
     var presenter: IWorkoutsPresenter? { get set }
-    var workoutItems: [WorkoutResponse]? { get set }
+    var workoutItems: [WorkoutResponse] { get set }
 }
 
 
@@ -33,9 +33,11 @@ final class WorkoutsViewController: UIViewController, IWorkoutsView {
         return cv
     }()
     
-    var workoutItems: [WorkoutResponse]? {
+    var workoutItems: [WorkoutResponse] = [] {
         didSet {
-            collectionView.reloadData()
+            DispatchQueue.main.async {
+                self.collectionView.reloadData()
+            }
         }
     }
     
@@ -67,22 +69,27 @@ extension WorkoutsViewController: UICollectionViewDataSource, UICollectionViewDe
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        workoutItems?.count ?? 0
+        guard workoutItems.count > 0 else { return 4 }
+        return workoutItems.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WorkoutCell.identifier, for: indexPath) as! WorkoutCell
-        guard let workoutItems else { return cell }
         
-        cell.configureCell(item: workoutItems[indexPath.row], style: .workout)
+        if workoutItems.count > 0 {
+            cell.configureCell(item: workoutItems[indexPath.row], style: .workout)
+        } else {
+            cell.configureSkeleton()
+        }
+        
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let workout = workoutItems?[indexPath.row]
+        let workout = workoutItems[indexPath.row]
         
         let repository = WorkoutRepository()
-        let presenter = ExercisesPresenter(repository: repository)
+        let presenter = ExercisesPresenter(repository: repository, workoutId: workout.id)
         let viewController = ExercisesViewController(presenter: presenter)
         presenter.view = viewController
         navigationController?.pushViewController(viewController, animated: true)

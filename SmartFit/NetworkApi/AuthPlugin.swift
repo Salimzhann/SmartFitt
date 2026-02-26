@@ -66,6 +66,7 @@ final class NetworkManager {
                 // ✅ SUCCESS
                 if (200...299).contains(response.statusCode) {
                     do {
+                        print(String(data: response.data, encoding: .utf8) ?? "NO JSON")
                         let decoded = try JSONDecoder().decode(T.self, from: response.data)
                         completion(.success(decoded))
                     } catch {

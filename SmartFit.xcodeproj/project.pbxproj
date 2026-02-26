@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		041831962F4FF95B0081AC50 /* PanModal in Frameworks */ = {isa = PBXBuildFile; productRef = 041831952F4FF95B0081AC50 /* PanModal */; };
 		047B52EB2F3723A8008B0420 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 047B52EA2F3723A8008B0420 /* SnapKit */; };
 		047B54452F39A627008B0420 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 047B54442F39A627008B0420 /* Moya */; };
 /* End PBXBuildFile section */
@@ -56,6 +57,7 @@
 			files = (
 				047B54452F39A627008B0420 /* Moya in Frameworks */,
 				047B52EB2F3723A8008B0420 /* SnapKit in Frameworks */,
+				041831962F4FF95B0081AC50 /* PanModal in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -109,6 +111,7 @@
 			packageProductDependencies = (
 				047B52EA2F3723A8008B0420 /* SnapKit */,
 				047B54442F39A627008B0420 /* Moya */,
+				041831952F4FF95B0081AC50 /* PanModal */,
 			);
 			productName = SmartFit;
 			productReference = 047B52D12F372261008B0420 /* SmartFit.app */;
@@ -141,6 +144,7 @@
 			packageReferences = (
 				047B52E92F3723A8008B0420 /* XCRemoteSwiftPackageReference "SnapKit" */,
 				047B54142F3999A0008B0420 /* XCRemoteSwiftPackageReference "Moya" */,
+				041831942F4FF95B0081AC50 /* XCRemoteSwiftPackageReference "PanModal" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 047B52D22F372261008B0420 /* Products */;
@@ -394,6 +398,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		041831942F4FF95B0081AC50 /* XCRemoteSwiftPackageReference "PanModal" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/slackhq/PanModal";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.7;
+			};
+		};
 		047B52E92F3723A8008B0420 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
@@ -413,6 +425,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		041831952F4FF95B0081AC50 /* PanModal */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 041831942F4FF95B0081AC50 /* XCRemoteSwiftPackageReference "PanModal" */;
+			productName = PanModal;
+		};
 		047B52EA2F3723A8008B0420 /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 047B52E92F3723A8008B0420 /* XCRemoteSwiftPackageReference "SnapKit" */;
