@@ -22,10 +22,13 @@ enum NetworkAPI {
     // Home Page Endpoint
     case infoMe
     
-    //Exercises Page
+    // Exercises Page
     case fetchWorkoutsList
     case fetchExercisesList(id: Int)
     case fetchExerciseDetails(id: Int)
+    
+    // AI Chat
+    case fetchChatHistory
 }
 
 extension NetworkAPI: TargetType {
@@ -51,6 +54,9 @@ extension NetworkAPI: TargetType {
         case .fetchWorkoutsList:                            return "/api/v1/body-areas"
         case .fetchExercisesList(let id):                   return "/api/v1/body-areas/\(id)/exercises"
         case .fetchExerciseDetails(id: let id):             return "/api/v1/exercises/\(id)/details"
+            
+            // AI Chat
+        case .fetchChatHistory:                           return "/api/v1/ai-chat/history"
         }
     }
 
@@ -59,7 +65,8 @@ extension NetworkAPI: TargetType {
         case .infoMe,
              .fetchWorkoutsList,
              .fetchExercisesList,
-             .fetchExerciseDetails:
+             .fetchExerciseDetails,
+             .fetchChatHistory:
             return .get
         default:
             return .post
@@ -106,7 +113,8 @@ extension NetworkAPI: TargetType {
         case .infoMe,
              .fetchWorkoutsList,
              .fetchExercisesList,
-             .fetchExerciseDetails:
+             .fetchExerciseDetails,
+             .fetchChatHistory:
             return .requestPlain
         }
     }

@@ -18,13 +18,17 @@ final class MainTabBarController: UITabBarController {
 
     private func setupTabs() {
         // Home Page
-        let repository = HomeRepository()
-        let homePresenter = HomePresenter(repository: repository)
+        let homeRepository = HomeRepository()
+        let homePresenter = HomePresenter(repository: homeRepository)
         let homeVC = HomeViewController(presenter: homePresenter)
         homePresenter.view = homeVC
         
         //Chat Page
+        let chatRepository = ChatRepoitory()
+        let chatPresenter = ChatPresenter(repository: chatRepository)
         let chatVC = ChatViewController()
+        chatVC.presenter = chatPresenter
+        chatPresenter.view = chatVC
         
         //Nutrition Page
         let caloriesVC = CaloriesViewController()

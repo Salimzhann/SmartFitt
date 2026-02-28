@@ -67,7 +67,7 @@ final class NetworkManager {
                 if (200...299).contains(response.statusCode) {
                     do {
                         print(String(data: response.data, encoding: .utf8) ?? "NO JSON")
-                        let decoded = try JSONDecoder().decode(T.self, from: response.data)
+                        let decoded = try makeJSONDecoder().decode(T.self, from: response.data)
                         completion(.success(decoded))
                     } catch {
                         completion(.failure(error))
@@ -99,7 +99,7 @@ final class NetworkManager {
             case .success(let response):
                 guard
                     (200...299).contains(response.statusCode),
-                    let decoded = try? JSONDecoder().decode(RefreshResponse.self, from: response.data)
+                    let decoded = try? makeJSONDecoder().decode(RefreshResponse.self, from: response.data)
                 else {
                     print("REFRESH BODY:", String(data: response.data, encoding: .utf8) ?? "no body")
                     self.logout()
@@ -119,6 +119,19 @@ final class NetworkManager {
                 self.logout()
             }
         }
+    }
+    
+    private func makeJSONDecoder() -> JSONDecoder {
+        let decoder = JSONDecoder()
+
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .iso8601)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
+
+        decoder.dateDecodingStrategy = .formatted(formatter)
+        return decoder
     }
 
     private func enqueue(_ block: @escaping () -> Void) {
