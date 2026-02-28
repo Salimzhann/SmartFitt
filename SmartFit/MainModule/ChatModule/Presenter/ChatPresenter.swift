@@ -14,79 +14,40 @@ protocol IChatPresenter: AnyObject {
 }
 
 
-class ChatPresenter: IChatPresenter {
-    
+final class ChatPresenter: IChatPresenter {
+
     weak var view: IChatView?
-    private let repository: IChatRepoitory
+    private let service: IChatService
+
     private var messages: [ChatMessageViewModel] = []
-    
-    init(repository: IChatRepoitory) {
-        self.repository = repository
+
+    init(service: IChatService) {
+        self.service = service
     }
-    
+
     func viewDidLoad() {
-        fetchHistory()
-    }
-    
-    private func fetchHistory() {
-        repository.fetchHistory { [weak self] result in
+        service.onMessage = { [weak self] message in
             guard let self else { return }
-            
-            switch result {
-            case .success(let response):
-                self.messages = response.map {
-                    ChatMessageViewModel(
-                        id: $0.id,
-                        text: $0.content,
-                        isIncoming: $0.role == .assistant
-                    )
-                }
-                
-                DispatchQueue.main.async {
-                    self.view?.updateMessages(self.messages)
-                }
-                
-            case .failure(let error):
-                print("CHAT ERROR:", error)
-            }
+            self.messages.append(message)
+            self.view?.updateMessages(self.messages)
         }
+
+        service.enterChat()
     }
-    
+
     func sendMessage(_ text: String) {
-        let localMessage = ChatMessageViewModel(
-                id: UUID().hashValue,
-                text: text,
-                isIncoming: false
-            )
+        let local = ChatMessageViewModel(
+            id: UUID().hashValue,
+            text: text,
+            isIncoming: false
+        )
 
-            messages.append(localMessage)
-            view?.updateMessages(messages)
+        messages.append(local)
+        view?.updateMessages(messages)
+        service.sendMessage(text)
+    }
 
-            // 2️⃣ отправка на сервер
-//            repository.sendMessage(text: text) { [weak self] result in
-//                guard let self else { return }
-//
-//                switch result {
-//                case .success(let response):
-//                    // 3️⃣ серверная история (user + assistant)
-//                    self.messages = response.map {
-//                        ChatMessageViewModel(
-//                            id: $0.id,
-//                            text: $0.content,
-//                            isIncoming: $0.role == .assistant
-//                        )
-//                    }
-//
-//                    DispatchQueue.main.async {
-//                        self.view?.updateMessages(self.messages)
-//                    }
-//
-//                case .failure(let error):
-//                    print("SEND MESSAGE ERROR:", error)
-//                    // тут можно:
-//                    // - показать toast
-//                    // - пометить сообщение как failed
-//                }
-//            }
+    func viewDidDisappear() {
+        service.leaveChat()
     }
 }

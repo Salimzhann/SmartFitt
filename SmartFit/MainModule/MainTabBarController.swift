@@ -25,7 +25,8 @@ final class MainTabBarController: UITabBarController {
         
         //Chat Page
         let chatRepository = ChatRepoitory()
-        let chatPresenter = ChatPresenter(repository: chatRepository)
+        let chatService = ChatService(repository: chatRepository, tokenProvider: TokenStorage.shared.getAccessToken)
+        let chatPresenter = ChatPresenter(service: chatService)
         let chatVC = ChatViewController()
         chatVC.presenter = chatPresenter
         chatPresenter.view = chatVC
