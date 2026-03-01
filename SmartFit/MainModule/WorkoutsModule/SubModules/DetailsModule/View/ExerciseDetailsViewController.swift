@@ -162,6 +162,7 @@ final class ExerciseDetailsViewController: UIViewController, IExerciseDetailsVie
     private let informationStackView: UIStackView = {
         let sv = UIStackView()
         sv.axis = .vertical
+        sv.spacing = 12
         return sv
     }()
     private lazy var descriptionView: UIView = {
@@ -279,7 +280,7 @@ final class ExerciseDetailsViewController: UIViewController, IExerciseDetailsVie
         data.benefits.forEach { benefit in
             let view = UIView()
             let label = UILabel()
-            label.font = .systemFont(ofSize: 13, weight: .light)
+            label.font = .systemFont(ofSize: 15, weight: .light)
             label.numberOfLines = 0
             label.text = benefit
             

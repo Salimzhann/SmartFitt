@@ -32,6 +32,13 @@ final class WorkoutCell: UICollectionViewCell {
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
+    private let imageSkeletonView: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor.systemGray5
+        view.layer.cornerRadius = 16
+        view.isHidden = true
+        return view
+    }()
     private let skeletonView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor.systemGray5
@@ -52,7 +59,9 @@ final class WorkoutCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        skeletonView.layer.removeAllAnimations()
+        imageView.image = nil
+        imageSkeletonView.layer.removeAllAnimations()
+        imageSkeletonView.isHidden = true
     }
     
     private func setupViews() {
@@ -71,23 +80,35 @@ final class WorkoutCell: UICollectionViewCell {
             make.size.equalTo(CGSize(width: 130, height: 110))
         }
         
+        contentView.addSubview(imageSkeletonView)
+        imageSkeletonView.snp.makeConstraints { make in
+            make.edges.equalTo(imageView)
+        }
+        
         contentView.addSubview(skeletonView)
         skeletonView.snp.makeConstraints { $0.edges.equalToSuperview() }
     }
     
     func configureCell(item: WorkoutResponse, style: CellStyle) {
         skeletonView.isHidden = true
-        titleLabel.isHidden = false
-        imageView.isHidden = false
-        
-        titleLabel.text = item.name
-        guard let url = URL(string: item.imageUrl) else {
-            imageView.image = nil
-            return
-        }
-        loadImage(from: url) { [weak self] image in
-            self?.imageView.image = image
-        }
+           titleLabel.isHidden = false
+           imageView.isHidden = false
+
+           titleLabel.text = item.name
+
+           imageView.image = nil
+           showImageSkeleton()
+
+           guard let url = URL(string: item.imageUrl) else {
+               hideImageSkeleton()
+               return
+           }
+
+           loadImage(from: url) { [weak self] image in
+               guard let self else { return }
+               self.imageView.image = image
+               self.hideImageSkeleton()
+           }
         
         switch style {
         case .exercise:
@@ -153,5 +174,23 @@ final class WorkoutCell: UICollectionViewCell {
                 completion(image)
             }
         }.resume()
+    }
+    
+    private func showImageSkeleton() {
+        imageSkeletonView.isHidden = false
+
+        let animation = CABasicAnimation(keyPath: "opacity")
+        animation.fromValue = 0.4
+        animation.toValue = 1
+        animation.duration = 0.9
+        animation.autoreverses = true
+        animation.repeatCount = .infinity
+
+        imageSkeletonView.layer.add(animation, forKey: "imageShimmer")
+    }
+
+    private func hideImageSkeleton() {
+        imageSkeletonView.layer.removeAnimation(forKey: "imageShimmer")
+        imageSkeletonView.isHidden = true
     }
 }
