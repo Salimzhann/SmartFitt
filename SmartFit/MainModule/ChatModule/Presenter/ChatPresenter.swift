@@ -11,6 +11,7 @@ protocol IChatPresenter: AnyObject {
     
     func viewDidLoad()
     func sendMessage(_ text: String)
+    func deleteHistory()
 }
 
 
@@ -31,6 +32,20 @@ final class ChatPresenter: IChatPresenter {
             self.messages.append(message)
             self.view?.updateMessages(self.messages)
         }
+        
+        service.onHistory = { [weak self] history in
+            guard let self else { return }
+            self.messages = history
+            self.view?.updateMessages(history)
+        }
+        
+        service.onHistoryCleared = { [weak self] in
+                guard let self else { return }
+
+                self.messages.removeAll()
+                self.view?.updateMessages([])
+                self.service.enterChat()
+            }
 
         service.enterChat()
     }
@@ -45,6 +60,10 @@ final class ChatPresenter: IChatPresenter {
         messages.append(local)
         view?.updateMessages(messages)
         service.sendMessage(text)
+    }
+    
+    func deleteHistory() {
+        service.deleteHistory()
     }
 
     func viewDidDisappear() {

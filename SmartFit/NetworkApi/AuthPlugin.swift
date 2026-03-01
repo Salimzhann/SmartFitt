@@ -81,6 +81,25 @@ final class NetworkManager {
             }
         }
     }
+    
+    func requestWithoutDecoding(
+        _ target: NetworkAPI,
+        completion: @escaping (Result<Void, Error>) -> Void
+    ) {
+        provider.request(target) { result in
+            switch result {
+            case .success(let response):
+                if (200...299).contains(response.statusCode) {
+                    completion(.success(()))
+                } else {
+                    completion(.failure(response.mapAPIError()))
+                }
+
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
 
     // MARK: - Refresh
     private func refreshIfNeeded() {

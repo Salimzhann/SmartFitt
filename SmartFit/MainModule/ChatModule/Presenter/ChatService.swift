@@ -12,7 +12,11 @@ protocol IChatService: AnyObject {
     func enterChat()
     func leaveChat()
     func sendMessage(_ text: String)
+    func deleteHistory()
+    
     var onMessage: ((ChatMessageViewModel) -> Void)? { get set }
+    var onHistory: (([ChatMessageViewModel]) -> Void)? { get set }
+    var onHistoryCleared: (() -> Void)? { get set }
 }
 
 
@@ -25,6 +29,8 @@ final class ChatService: IChatService {
     private let tokenProvider: () -> String?
 
     var onMessage: ((ChatMessageViewModel) -> Void)?
+    var onHistory: (([ChatMessageViewModel]) -> Void)?
+    var onHistoryCleared: (() -> Void)?
 
     init(
         repository: IChatRepoitory,
@@ -47,17 +53,40 @@ final class ChatService: IChatService {
         // 1️⃣ сперва грузим историю
         fetchHistoryAndConnect()
     }
-
+    
+    func deleteHistory() {
+        repository.deleteHistory { [weak self] result in
+            switch result {
+            case .success:
+                DispatchQueue.main.async {
+                    self?.closeSocket()
+                    self?.onHistoryCleared?()
+                }
+            case .failure(let error):
+                print("DELETE CHAT ERROR:", error)
+            }
+        }
+    }
+    
     private func fetchHistoryAndConnect() {
         repository.fetchHistory { [weak self] result in
             guard let self else { return }
 
             switch result {
-            case .success:
+            case .success(let result):
+                let history = result.map {
+                    ChatMessageViewModel(
+                        id: $0.id,
+                        text: $0.content,
+                        isIncoming: $0.role == .assistant
+                    )
+                }
+                
                 DispatchQueue.main.async {
+                    self.onHistory?(history)
                     self.openSocket()
                 }
-
+                
             case .failure(let error):
                 print("CHAT HISTORY ERROR:", error)
             }
@@ -143,5 +172,27 @@ final class ChatService: IChatService {
     private func closeSocket() {
         socket?.cancel(with: .goingAway, reason: nil)
         socket = nil
+    }
+    
+    func fetchHistory(completion: @escaping ([ChatMessageViewModel]) -> Void) {
+        repository.fetchHistory { result in
+            switch result {
+            case .success(let response):
+                let messages = response.map {
+                    ChatMessageViewModel(
+                        id: $0.id,
+                        text: $0.content,
+                        isIncoming: $0.role == .assistant
+                    )
+                }
+                DispatchQueue.main.async {
+                    completion(messages)
+                }
+
+            case .failure(let error):
+                print("CHAT HISTORY ERROR:", error)
+                completion([])
+            }
+        }
     }
 }

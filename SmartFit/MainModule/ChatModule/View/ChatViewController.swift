@@ -23,14 +23,34 @@ final class ChatViewController: UIViewController {
     private var messages: [ChatMessageViewModel] = []
     private var inputBottomConstraint: Constraint?
 
-    private let tableView = UITableView()
+    private lazy var tableView: UITableView = {
+        let tableView = UITableView()
+        tableView.separatorStyle = .none
+        tableView.register(ChatMessageCell.self, forCellReuseIdentifier: ChatMessageCell.reuseId)
+        tableView.dataSource = self
+        tableView.delegate = self
+        tableView.keyboardDismissMode = .interactive
+        return tableView
+    }()
     private let inputViewContainer = ChatInputView()
+    private lazy var profileView: TrainerNavigationBar = {
+        let profile = TrainerNavigationBar()
+        profile.onDeleteHistory = { [weak presenter] in
+            presenter?.deleteHistory()
+        }
+        return profile
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         setupKeyboardObservers()
         presenter?.viewDidLoad()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: false)
     }
     
     deinit {
@@ -40,23 +60,24 @@ final class ChatViewController: UIViewController {
     private func setupUI() {
         view.backgroundColor = .systemBackground
 
-        tableView.separatorStyle = .none
-        tableView.register(ChatMessageCell.self, forCellReuseIdentifier: ChatMessageCell.reuseId)
-        tableView.dataSource = self
-        tableView.delegate = self
-        tableView.keyboardDismissMode = .interactive
-
-        view.addSubview(tableView)
-        view.addSubview(inputViewContainer)
-
-        tableView.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview()
-            $0.bottom.equalTo(inputViewContainer.snp.top)
+        if profileView.superview == nil {
+            view.addSubview(profileView)
         }
-
+        profileView.snp.makeConstraints { make in
+            make.top.leading.trailing.equalToSuperview()
+        }
+        
+        view.addSubview(inputViewContainer)
         inputViewContainer.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(12)
             inputBottomConstraint = $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(8).constraint
+        }
+        
+        view.addSubview(tableView)
+        tableView.snp.makeConstraints {
+            $0.top.equalTo(profileView.snp.bottom)
+            $0.leading.trailing.equalToSuperview()
+            $0.bottom.equalTo(inputViewContainer.snp.top).offset(-8)
         }
 
         inputViewContainer.sendButton.addTarget(

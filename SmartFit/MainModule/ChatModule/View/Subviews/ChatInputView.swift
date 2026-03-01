@@ -40,8 +40,11 @@ final class ChatInputView: UIView {
             $0.height.equalTo(24)
         }
 
+        sendButton.setContentHuggingPriority(.required, for: .horizontal)
+        sendButton.setContentCompressionResistancePriority(.required, for: .horizontal)
         sendButton.snp.makeConstraints {
-            $0.trailing.top.bottom.equalToSuperview().inset(12)
+            $0.centerY.equalToSuperview()
+            $0.trailing.equalToSuperview().inset(12)
         }
     }
 }

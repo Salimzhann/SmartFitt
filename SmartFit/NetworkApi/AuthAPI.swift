@@ -29,6 +29,7 @@ enum NetworkAPI {
     
     // AI Chat
     case fetchChatHistory
+    case deleteChatHistory
 }
 
 extension NetworkAPI: TargetType {
@@ -56,7 +57,8 @@ extension NetworkAPI: TargetType {
         case .fetchExerciseDetails(id: let id):             return "/api/v1/exercises/\(id)/details"
             
             // AI Chat
-        case .fetchChatHistory:                           return "/api/v1/ai-chat/history"
+        case .fetchChatHistory,
+             .deleteChatHistory:                            return "/api/v1/ai-chat/history"
         }
     }
 
@@ -68,6 +70,8 @@ extension NetworkAPI: TargetType {
              .fetchExerciseDetails,
              .fetchChatHistory:
             return .get
+        case .deleteChatHistory:
+            return .delete
         default:
             return .post
         }
@@ -114,7 +118,8 @@ extension NetworkAPI: TargetType {
              .fetchWorkoutsList,
              .fetchExercisesList,
              .fetchExerciseDetails,
-             .fetchChatHistory:
+             .fetchChatHistory,
+             .deleteChatHistory:
             return .requestPlain
         }
     }
