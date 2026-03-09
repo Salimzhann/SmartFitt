@@ -25,6 +25,7 @@ final class WorkoutCell: UICollectionViewCell {
         label.font = UIFont.systemFont(ofSize: 25, weight: .bold)
         label.textColor = .label
         label.textAlignment = .left
+        label.numberOfLines = 0
         return label
     }()
     private let imageView: UIImageView = {
@@ -116,7 +117,7 @@ final class WorkoutCell: UICollectionViewCell {
             contentView.backgroundColor = .systemBackground
             contentView.layer.borderWidth = 1
             contentView.layer.borderColor = UIColor.black.cgColor
-            titleLabel.font = UIFont.systemFont(ofSize: 25, weight: .medium)
+            titleLabel.font = UIFont.systemFont(ofSize: 20, weight: .medium)
             
             updateViewConstraints()
             
