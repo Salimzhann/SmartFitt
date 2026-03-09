@@ -32,7 +32,11 @@ final class MainTabBarController: UITabBarController {
         chatPresenter.view = chatVC
         
         //Nutrition Page
+        let caloriesRepository = CaloriesRepository()
+        let caloriesPresenter = CaloriesPresenter(repository: caloriesRepository)
         let caloriesVC = CaloriesViewController()
+        caloriesVC.presenter = caloriesPresenter
+        caloriesPresenter.view = caloriesVC
         
         // Workout Pag
         let workoutRepository = WorkoutRepository()

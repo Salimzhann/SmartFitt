@@ -30,6 +30,9 @@ enum NetworkAPI {
     // AI Chat
     case fetchChatHistory
     case deleteChatHistory
+    
+    // AI calories calculator
+    case fetchCalories
 }
 
 extension NetworkAPI: TargetType {
@@ -59,6 +62,9 @@ extension NetworkAPI: TargetType {
             // AI Chat
         case .fetchChatHistory,
              .deleteChatHistory:                            return "/api/v1/ai-chat/history"
+            
+            // AI calories calculator
+        case .fetchCalories:                                return "/api/v1/nutrition/calories"
         }
     }
 
@@ -68,7 +74,8 @@ extension NetworkAPI: TargetType {
              .fetchWorkoutsList,
              .fetchExercisesList,
              .fetchExerciseDetails,
-             .fetchChatHistory:
+             .fetchChatHistory,
+             .fetchCalories:
             return .get
         case .deleteChatHistory:
             return .delete
@@ -119,7 +126,8 @@ extension NetworkAPI: TargetType {
              .fetchExercisesList,
              .fetchExerciseDetails,
              .fetchChatHistory,
-             .deleteChatHistory:
+             .deleteChatHistory,
+             .fetchCalories:
             return .requestPlain
         }
     }

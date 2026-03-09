@@ -77,4 +77,38 @@ extension UIColor {
         blue: 159/255,
         alpha: 1
     )
+    
+    static let deepTeal = UIColor(
+        red: 5/255,
+        green: 53/255,
+        blue: 96/255,
+        alpha: 1
+    )
+}
+
+
+extension UIImage {
+
+    func cropToSquare() -> UIImage? {
+
+        let side = min(size.width, size.height)
+
+        let x = (size.width - side) / 2
+        let y = (size.height - side) / 2
+
+        let rect = CGRect(x: x, y: y, width: side, height: side)
+
+        guard let cg = cgImage?.cropping(to: rect) else { return nil }
+
+        return UIImage(cgImage: cg)
+    }
+
+    func resizeTo512() -> UIImage {
+
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 512, height: 512))
+
+        return renderer.image { _ in
+            draw(in: CGRect(x: 0, y: 0, width: 512, height: 512))
+        }
+    }
 }
