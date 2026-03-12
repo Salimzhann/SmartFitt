@@ -65,6 +65,18 @@ final class CaloriesViewController: UIViewController {
     }()
     private let trackLayer = CAShapeLayer()
     private let progressLayer = CAShapeLayer()
+    private let myMealsLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 18, weight: .semibold)
+        label.text = "My meals"
+        return label
+    }()
+    private let mealsStackView: UIStackView = {
+        let view = UIStackView()
+        view.axis = .vertical
+        view.spacing = 8
+        return view
+    }()
     private lazy var scanButton: UIButton = {
         let button = UIButton(type: .system)
         let image = UIImage(systemName: "camera.fill")
@@ -143,6 +155,18 @@ final class CaloriesViewController: UIViewController {
         prevButton.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
             make.leading.equalToSuperview().inset(20)
+        }
+        
+        view.addSubview(myMealsLabel)
+        myMealsLabel.snp.makeConstraints { make in
+            make.top.equalTo(kcalContentView.snp.bottom).offset(24)
+            make.leading.equalToSuperview().inset(16)
+        }
+        
+        view.addSubview(mealsStackView)
+        mealsStackView.snp.makeConstraints { make in
+            make.top.equalTo(myMealsLabel.snp.bottom).offset(12)
+            make.leading.trailing.equalToSuperview().inset(16)
         }
         
         view.addSubview(scanButton)
@@ -252,6 +276,19 @@ extension CaloriesViewController: ICaloriesView {
         stackView.arrangedSubviews.forEach {
             stackView.removeArrangedSubview($0)
             $0.removeFromSuperview()
+        }
+        
+        mealsStackView.arrangedSubviews.forEach {
+            stackView.removeArrangedSubview($0)
+            $0.removeFromSuperview()
+        }
+        
+        response.meals.forEach { meal in
+            let label = UILabel()
+            label.textColor = .secondaryLabel
+            label.font = .systemFont(ofSize: 18, weight: .regular)
+            label.text = meal.name + " - " + meal.kcal + " Kcal"
+            mealsStackView.addArrangedSubview(label)
         }
         
         stackView.addArrangedSubview(setupNutritionLabels(text: "Protein \n \(response.protein) g"))

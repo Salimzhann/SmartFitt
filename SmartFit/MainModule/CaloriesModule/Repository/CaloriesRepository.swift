@@ -27,7 +27,15 @@ final class CaloriesRepository: ICaloriesRepository {
                 carbs: 180,
                 servingAmount: 320,
                 servingUnit: "g",
-                calculatedAt: "2026-02-02"
+                calculatedAt: "2026-02-02",
+                meals: [
+                    .init(name: "Plov", kcal: "880"),
+                    .init(name: "Beshbarmak", kcal: "1 230"),
+                    .init(name: "Apple", kcal: "40"),
+                    .init(name: "Snickers", kcal: "600"),
+                    .init(name: "Nuts (300 gr)", kcal: "180"),
+                    .init(name: "Protein Smoothie", kcal: "130")
+                ]
             ),
             CaloriesResponse(
                 kcal: 1343,
@@ -36,7 +44,13 @@ final class CaloriesRepository: ICaloriesRepository {
                 carbs: 184,
                 servingAmount: 325,
                 servingUnit: "g",
-                calculatedAt: "2026-02-03"
+                calculatedAt: "2026-02-03",
+                meals: [
+                    .init(name: "Lagman", kcal: "930"),
+                    .init(name: "Quyrdaq", kcal: "1 110"),
+                    .init(name: "Banana", kcal: "24"),
+                    .init(name: "Bounty", kcal: "410")
+                ]
             ),
             CaloriesResponse(
                 kcal: 1500,
@@ -45,7 +59,14 @@ final class CaloriesRepository: ICaloriesRepository {
                 carbs: 210,
                 servingAmount: 340,
                 servingUnit: "g",
-                calculatedAt: "2026-02-04"
+                calculatedAt: "2026-02-04",
+                meals: [
+                    .init(name: "Cheese Burger", kcal: "920"),
+                    .init(name: "Manty", kcal: "1 020"),
+                    .init(name: "Strawberry", kcal: "63"),
+                    .init(name: "Cake", kcal: "729"),
+                    .init(name: "Rice Porridge", kcal: "110")
+                ]
             )
         ]
         

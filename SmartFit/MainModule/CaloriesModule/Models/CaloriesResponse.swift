@@ -15,6 +15,7 @@ struct CaloriesResponse: Decodable {
     let servingAmount: Int
     let servingUnit: String
     let calculatedAt: String
+    let meals: [Meals]
 
     enum CodingKeys: String, CodingKey {
         
@@ -22,8 +23,16 @@ struct CaloriesResponse: Decodable {
         case protein
         case fat
         case carbs
+        case meals
         case servingAmount = "serving_amount"
         case servingUnit = "serving_unit"
         case calculatedAt = "calculated_at"
     }
+}
+
+
+struct Meals: Decodable {
+    
+    let name: String
+    let kcal: String
 }
