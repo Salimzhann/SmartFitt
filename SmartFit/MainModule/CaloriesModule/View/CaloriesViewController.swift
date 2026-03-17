@@ -210,7 +210,7 @@ final class CaloriesViewController: UIViewController {
         kcalContentView.layer.addSublayer(progressLayer)
     }
     
-    private func updateCircle(kcal: Int) {
+    private func updateCircle(kcal: Double) {
         
         guard circleInitialized else { return }
         
@@ -268,10 +268,10 @@ final class CaloriesViewController: UIViewController {
 extension CaloriesViewController: ICaloriesView {
 
     func showCalories(response: CaloriesResponse, isNextEnabled: Bool, isPrevEnabled: Bool) {
-        updateCircle(kcal: response.kcal)
+        updateCircle(kcal: response.weight.kcal)
 
-        kcalLabel.text = "\(response.kcal) \n Kcal"
-        dateLabel.text = formatDate(response.calculatedAt)
+        kcalLabel.text = "\(response.weight.kcal) \n Kcal"
+        dateLabel.text = formatDate(response.nutritionDate)
         
         stackView.arrangedSubviews.forEach {
             stackView.removeArrangedSubview($0)
@@ -287,13 +287,13 @@ extension CaloriesViewController: ICaloriesView {
             let label = UILabel()
             label.textColor = .secondaryLabel
             label.font = .systemFont(ofSize: 18, weight: .regular)
-            label.text = meal.name + " - " + meal.kcal + " Kcal"
+            label.text = meal.name + " - \(meal.kcal) Kcal"
             mealsStackView.addArrangedSubview(label)
         }
         
-        stackView.addArrangedSubview(setupNutritionLabels(text: "Protein \n \(response.protein) g"))
-        stackView.addArrangedSubview(setupNutritionLabels(text: "Fat \n \(response.fat) g"))
-        stackView.addArrangedSubview(setupNutritionLabels(text: "Carbs \n \(response.carbs) g"))
+        stackView.addArrangedSubview(setupNutritionLabels(text: "Protein \n \(response.weight.protein) g"))
+        stackView.addArrangedSubview(setupNutritionLabels(text: "Fat \n \(response.weight.fat) g"))
+        stackView.addArrangedSubview(setupNutritionLabels(text: "Carbs \n \(response.weight.carbs) g"))
 
         nextButton.isEnabled = isNextEnabled
         prevButton.isEnabled = isPrevEnabled

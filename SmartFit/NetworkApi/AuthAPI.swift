@@ -64,7 +64,7 @@ extension NetworkAPI: TargetType {
              .deleteChatHistory:                            return "/api/v1/ai-chat/history"
             
             // AI calories calculator
-        case .fetchCalories:                                return "/api/v1/nutrition/calories"
+        case .fetchCalories:                                return "/api/v1/nutritions/"
         }
     }
 

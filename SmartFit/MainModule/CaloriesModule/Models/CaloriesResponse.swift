@@ -8,31 +8,42 @@
 
 struct CaloriesResponse: Decodable {
     
-    let kcal: Int
-    let protein: Int
-    let fat: Int
-    let carbs: Int
-    let servingAmount: Int
-    let servingUnit: String
-    let calculatedAt: String
-    let meals: [Meals]
-
+    let nutritionDate: String
+    let weight: Weight
+    let meals: [Meal]
+    
     enum CodingKeys: String, CodingKey {
         
-        case kcal
-        case protein
-        case fat
-        case carbs
+        case nutritionDate = "nutrition_date"
+        case weight
         case meals
-        case servingAmount = "serving_amount"
-        case servingUnit = "serving_unit"
-        case calculatedAt = "calculated_at"
     }
 }
 
 
-struct Meals: Decodable {
+struct Weight: Decodable {
+    
+    let kcal: Double
+    let protein: Double
+    let carbs: Double
+    let fat: Double
+    let servingAmount: Double
+    let servingUnit: String
+    
+    enum CodingKeys: String, CodingKey {
+        
+        case kcal
+        case protein
+        case carbs
+        case fat
+        case servingAmount = "serving_amount"
+        case servingUnit = "serving_unit"
+    }
+}
+
+
+struct Meal: Decodable {
     
     let name: String
-    let kcal: String
+    let kcal: Double
 }

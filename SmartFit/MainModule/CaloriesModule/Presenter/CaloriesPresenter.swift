@@ -34,7 +34,6 @@ final class CaloriesPresenter: ICaloriesPresenter {
     private func fetchCalories() {
         repository.fetchCalories { [weak self] result in
             switch result {
-
             case .success(let response):
                 self?.days = response
                 self?.currentIndex = response.count - 1
