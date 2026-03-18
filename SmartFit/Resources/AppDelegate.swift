@@ -16,24 +16,36 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
-
-        if !UserDefaults.standard.bool(forKey: "hasLaunchedBefore") {
-            TokenStorage.shared.clear()
-            UserDefaults.standard.set(true, forKey: "hasLaunchedBefore")
-        }
-
+        
         window = UIWindow(frame: UIScreen.main.bounds)
+        
+        let hasOnboarding = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
+        let hasToken = !(TokenStorage.shared.getAccessToken()?.isEmpty ?? true)
 
-        if let token = TokenStorage.shared.getAccessToken(),
-           !token.isEmpty {
-            window?.rootViewController = MainTabBarController()
+        if !hasOnboarding {
+            showOnboarding()
+        } else if !hasToken {
+            showAuth()
         } else {
-            let onboarding = OnboardingViewController()
-            window?.rootViewController = UINavigationController(rootViewController: onboarding)
+            showMain()
         }
-
+        
         window?.makeKeyAndVisible()
         return true
+    }
+    
+    private func showOnboarding() {
+        let vc = HelperOnboardingViewController()
+        window?.rootViewController = vc
+    }
+
+    private func showAuth() {
+        let vc = OnboardingViewController()
+        window?.rootViewController = UINavigationController(rootViewController: vc)
+    }
+
+    private func showMain() {
+        window?.rootViewController = MainTabBarController()
     }
 }
 
