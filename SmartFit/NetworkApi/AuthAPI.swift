@@ -33,6 +33,7 @@ enum NetworkAPI {
     
     // AI calories calculator
     case fetchCalories
+    case uploadNutrition(photo: Data)
 }
 
 extension NetworkAPI: TargetType {
@@ -64,7 +65,8 @@ extension NetworkAPI: TargetType {
              .deleteChatHistory:                            return "/api/v1/ai-chat/history"
             
             // AI calories calculator
-        case .fetchCalories:                                return "/api/v1/nutritions/"
+        case .fetchCalories,
+             .uploadNutrition:                              return "/api/v1/nutritions/"
         }
     }
 
@@ -121,6 +123,15 @@ extension NetworkAPI: TargetType {
                 encoding: JSONEncoding.default
             )
             
+        case let .uploadNutrition(photo):
+            let formData = MultipartFormData(
+                provider: .data(photo),
+                name: "photo",
+                fileName: "image.jpg",
+                mimeType: "image/jpeg"
+            )
+            return .uploadMultipart([formData])
+            
         case .infoMe,
              .fetchWorkoutsList,
              .fetchExercisesList,
@@ -133,7 +144,12 @@ extension NetworkAPI: TargetType {
     }
 
     var headers: [String: String]? {
-        ["Content-Type": "application/json"]
+        switch self {
+        case .uploadNutrition:
+            return nil
+        default:
+            return ["Content-Type": "application/json"]
+        }
     }
 
     var sampleData: Data { Data() }

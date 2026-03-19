@@ -7,7 +7,13 @@
 
 import UIKit
 import SnapKit
+import PanModal
 import AVFoundation
+
+protocol FoodCameraDelegate: AnyObject {
+    
+    func didCaptureFood(image: UIImage)
+}
 
 
 final class FoodCameraViewController: UIViewController {
@@ -17,7 +23,9 @@ final class FoodCameraViewController: UIViewController {
     private var previewLayer: AVCaptureVideoPreviewLayer!
 
     private let scanFrameView = UIView()
-
+    weak var delegate: FoodCameraDelegate?
+    var resultVC: NutritionResultViewController?
+    
     private let backButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(systemName: "chevron.left"), for: .normal)
@@ -207,6 +215,20 @@ final class FoodCameraViewController: UIViewController {
     @objc private func backTap() {
         dismiss(animated: true)
     }
+    
+    private func freezeCamera() {
+        session.stopRunning()
+    }
+    
+    func showResult(_ result: NutritionResponse) {
+        resultVC?.showResult(result)
+    }
+    
+    func resumeCamera() {
+        if !session.isRunning {
+            session.startRunning()
+        }
+    }
 }
 
 extension FoodCameraViewController: AVCapturePhotoCaptureDelegate {
@@ -216,8 +238,8 @@ extension FoodCameraViewController: AVCapturePhotoCaptureDelegate {
         didFinishProcessingPhoto photo: AVCapturePhoto,
         error: Error?
     ) {
-
         guard
+            error == nil,
             let data = photo.fileDataRepresentation(),
             let image = UIImage(data: data)
         else { return }
@@ -226,6 +248,40 @@ extension FoodCameraViewController: AVCapturePhotoCaptureDelegate {
             .cropToSquare()?
             .resizeTo512()
 
-        print("Image ready for backend:", finalImage ?? "")
+        guard let finalImage else { return }
+
+        delegate?.didCaptureFood(image: finalImage)
+
+        freezeCamera()
+
+        let vc = NutritionResultViewController()
+        vc.delegate = self
+        resultVC = vc
+
+        presentPanModal(vc)
+    }
+    
+    func dismissResult(message: String) {
+        resultVC?.dismiss(animated: true)
+        
+        let alert = UIAlertController(
+            title: "Error",
+            message: message,
+            preferredStyle: .alert
+        )
+        
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        
+        present(alert, animated: true)
+    }
+}
+
+
+extension FoodCameraViewController: NutritionResultViewControllerDelegate {
+    
+    func presenterViewClosed() {
+        DispatchQueue.global(qos: .userInitiated).async {
+            self.session.startRunning()
+        }
     }
 }

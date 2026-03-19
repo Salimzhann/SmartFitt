@@ -5,6 +5,7 @@
 //  Created by Manas Salimzhan on 09.03.2026.
 //
 
+import UIKit
 import Foundation
 
 protocol ICaloriesPresenter: AnyObject {
@@ -12,6 +13,7 @@ protocol ICaloriesPresenter: AnyObject {
     func viewDidLoad()
     func didTapNextDay()
     func didTapPreviousDay()
+    func uploadFood(image: UIImage)
 }
 
 
@@ -65,5 +67,24 @@ final class CaloriesPresenter: ICaloriesPresenter {
         guard currentIndex > 0 else { return }
         currentIndex -= 1
         updateUI()
+    }
+    
+    func uploadFood(image: UIImage) {
+        guard let data = image.jpegData(compressionQuality: 0.8) else { return }
+        
+        repository.uploadNutrition(imageData: data) { result in
+            switch result {
+            case .success(let response):
+                print("SUCCESS:", response)
+                DispatchQueue.main.async {
+                    self.view?.didReceiveNutrition(result: response)
+                }
+                
+            case .failure(let error):
+                DispatchQueue.main.async {
+                    self.view?.showError(message: error.localizedDescription)
+                }
+            }
+        }
     }
 }

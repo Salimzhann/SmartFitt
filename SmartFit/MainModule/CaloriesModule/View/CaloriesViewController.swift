@@ -13,6 +13,8 @@ protocol ICaloriesView: AnyObject {
     var presenter: ICaloriesPresenter? { get set }
 
     func showCalories(response: CaloriesResponse, isNextEnabled: Bool, isPrevEnabled: Bool)
+    func didReceiveNutrition(result: NutritionResponse)
+    func showError(message: String)
 }
 
 
@@ -96,6 +98,7 @@ final class CaloriesViewController: UIViewController {
     var presenter: ICaloriesPresenter?
     private let circleRadius: CGFloat = 85
     private var circleInitialized = false
+    private weak var currentCameraVC: FoodCameraViewController?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -259,6 +262,8 @@ final class CaloriesViewController: UIViewController {
     
     @objc private func scanTap() {
         let vc = FoodCameraViewController()
+        vc.delegate = self
+        currentCameraVC = vc
         vc.modalPresentationStyle = .fullScreen
         present(vc, animated: true)
     }
@@ -297,5 +302,21 @@ extension CaloriesViewController: ICaloriesView {
 
         nextButton.isEnabled = isNextEnabled
         prevButton.isEnabled = isPrevEnabled
+    }
+    
+    func didReceiveNutrition(result: NutritionResponse) {
+        currentCameraVC?.showResult(result)
+    }
+    
+    func showError(message: String) {
+        currentCameraVC?.dismissResult(message: message)
+    }
+}
+
+
+extension CaloriesViewController: FoodCameraDelegate {
+    
+    func didCaptureFood(image: UIImage) {
+        presenter?.uploadFood(image: image)
     }
 }
