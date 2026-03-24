@@ -34,6 +34,9 @@ enum NetworkAPI {
     // AI calories calculator
     case fetchCalories
     case uploadNutrition(photo: Data)
+    
+    // Onboarding
+    case onboarding(data: OnboardingData)
 }
 
 extension NetworkAPI: TargetType {
@@ -67,6 +70,9 @@ extension NetworkAPI: TargetType {
             // AI calories calculator
         case .fetchCalories,
              .uploadNutrition:                              return "/api/v1/nutritions/"
+            
+            // Onboarding
+        case .onboarding:                                   return "/api/v1/auth/onbording"
         }
     }
 
@@ -131,6 +137,19 @@ extension NetworkAPI: TargetType {
                 mimeType: "image/jpeg"
             )
             return .uploadMultipart([formData])
+            
+        case let .onboarding(data):
+            return .requestParameters(
+                parameters: [
+                    "age": data.age!,
+                    "height": data.height!,
+                    "weight": data.weight!,
+                    "gender": data.gender!.rawValue,
+                    "activity_level": data.activity!.rawValue,
+                    "goal": data.goal!.rawValue
+                ],
+                encoding: JSONEncoding.default
+            )
             
         case .infoMe,
              .fetchWorkoutsList,

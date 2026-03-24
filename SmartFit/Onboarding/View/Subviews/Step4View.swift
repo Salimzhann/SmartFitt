@@ -12,9 +12,10 @@ import SnapKit
 final class Step4View: UIView {
     
     enum ActivityLevel: String {
-        case beginner = "Beginner"
-        case intermediate = "Intermediate"
-        case advanced = "Advanced"
+        
+        case beginner = "BEGINNER"
+        case intermediate = "INTERMEDIATE"
+        case advanced = "ADVANCED"
     }
     
     var selectedActivity: ActivityLevel = .beginner

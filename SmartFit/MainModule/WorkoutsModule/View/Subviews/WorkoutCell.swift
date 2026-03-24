@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import Kingfisher
 
 
 enum CellStyle {
@@ -92,24 +93,35 @@ final class WorkoutCell: UICollectionViewCell {
     
     func configureCell(item: WorkoutResponse, style: CellStyle) {
         skeletonView.isHidden = true
-           titleLabel.isHidden = false
-           imageView.isHidden = false
-
-           titleLabel.text = item.name
-
-           imageView.image = nil
-           showImageSkeleton()
-
-           guard let url = URL(string: item.imageUrl) else {
-               hideImageSkeleton()
-               return
-           }
-
-           loadImage(from: url) { [weak self] image in
-               guard let self else { return }
-               self.imageView.image = image
-               self.hideImageSkeleton()
-           }
+        titleLabel.isHidden = false
+        imageView.isHidden = false
+        
+        titleLabel.text = item.name
+        
+        imageView.image = nil
+        showImageSkeleton()
+        
+        guard let url = URL(string: item.imageUrl) else {
+            hideImageSkeleton()
+            return
+        }
+        
+        imageView.kf.setImage(
+            with: url,
+            placeholder: nil,
+            options: [
+                .transition(.fade(0.2)),
+                .cacheOriginalImage
+            ]
+        ) { [weak self] result in
+            switch result {
+            case .success:
+                self?.hideImageSkeleton()
+                
+            case .failure:
+                self?.hideImageSkeleton()
+            }
+        }
         
         switch style {
         case .exercise:
@@ -159,22 +171,6 @@ final class WorkoutCell: UICollectionViewCell {
             make.leading.equalTo(imageView.snp.trailing).offset(24)
             make.trailing.equalToSuperview().inset(16)
         }
-    }
-    
-    func loadImage(from url: URL, completion: @escaping (UIImage?) -> Void) {
-        URLSession.shared.dataTask(with: url) { data, _, _ in
-            guard
-                let data,
-                let image = UIImage(data: data)
-            else {
-                completion(nil)
-                return
-            }
-
-            DispatchQueue.main.async {
-                completion(image)
-            }
-        }.resume()
     }
     
     private func showImageSkeleton() {

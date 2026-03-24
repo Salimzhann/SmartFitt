@@ -12,10 +12,11 @@ import SnapKit
 final class Step5View: UIView {
     
     enum ActivityLevel: String {
-        case loseWeight = "Lose Weight"
-        case buildMuscle = "Build Muscle"
-        case stayFit = "Stay Fit"
-        case imroveFlexibility = "Imrove Flexibility"
+        
+        case loseWeight = "LOOSE_WEIGHT"
+        case buildMuscle = "BUILD_MUSCLE"
+        case stayFit = "STAY_FIT"
+        case improveFlexibility = "IMPROVE_FLEXIBILITY"
     }
     
     var selectedActivity: ActivityLevel = .loseWeight
@@ -93,7 +94,7 @@ final class Step5View: UIView {
         }
         
         imroveFlexibilityView.onTap = { [weak self] in
-            self?.select(.imroveFlexibility)
+            self?.select(.improveFlexibility)
         }
     }
     
@@ -106,7 +107,7 @@ final class Step5View: UIView {
         loseWeightView.setSelected(selectedActivity == .loseWeight)
         buildMuscleView.setSelected(selectedActivity == .buildMuscle)
         stayFitView.setSelected(selectedActivity == .stayFit)
-        imroveFlexibilityView.setSelected(selectedActivity == .imroveFlexibility)
+        imroveFlexibilityView.setSelected(selectedActivity == .improveFlexibility)
     }
 }
 

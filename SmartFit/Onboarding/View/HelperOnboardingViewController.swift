@@ -11,16 +11,18 @@ import SnapKit
 protocol IHelperOnboardingView: AnyObject {
     
     var presenter: IHelperOnboardingPresenter? { get set }
+    
+    func onboardingSuccess()
+    func showError(_ message: String)
 }
 
-
 protocol OnboardingStep {
+    
     func getData() -> Any
 }
 
+
 final class HelperOnboardingViewController: UIViewController, IHelperOnboardingView {
-    
-    // MARK: - Properties
     
     private var currentStep = 0
     
@@ -111,15 +113,8 @@ final class HelperOnboardingViewController: UIViewController, IHelperOnboardingV
     }
     
     private func finishOnboarding() {
-        UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
-        
         let data = collectData()
-        print(data, "soifnsoeno")
-        
-        if let window = UIApplication.shared.windows.first {
-            window.rootViewController = MainTabBarController()
-            window.makeKeyAndVisible()
-        }
+        presenter?.submit(data: data)
     }
     
     private func collectData() -> OnboardingData {
@@ -133,8 +128,8 @@ final class HelperOnboardingViewController: UIViewController, IHelperOnboardingV
             switch data {
             case let d as Step1Data:
                 result.age = d.age
-                result.gender = d.gender
-                
+                result.gender = Gender(rawValue: d.gender)
+
             case let d as Step2Data:
                 result.height = d.height
                 
@@ -142,10 +137,10 @@ final class HelperOnboardingViewController: UIViewController, IHelperOnboardingV
                 result.weight = d.weight
                 
             case let d as Step4Data:
-                result.activity = d.activity
+                result.activity = ActivityLevel(rawValue: d.activity)
                 
             case let d as Step5Data:
-                result.goal = d.goal
+                result.goal = Goal(rawValue: d.goal)
                 
             default:
                 break
@@ -153,6 +148,24 @@ final class HelperOnboardingViewController: UIViewController, IHelperOnboardingV
         }
         
         return result
+    }
+    
+    func onboardingSuccess() {
+        UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
+        
+        let window = UIApplication.shared.windows.first
+        window?.rootViewController = MainTabBarController()
+        window?.makeKeyAndVisible()
+    }
+    
+    func showError(_ message: String) {
+        let alert = UIAlertController(
+            title: "Error",
+            message: message,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
 }
 

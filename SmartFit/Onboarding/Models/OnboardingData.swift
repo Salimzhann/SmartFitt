@@ -6,12 +6,31 @@
 //
 
 
+enum Gender: String {
+    case male = "MALE"
+    case female = "FEMALE"
+}
+
+enum ActivityLevel: String {
+    case beginner = "BEGINNER"
+    case intermediate = "INTERMEDIATE"
+    case advanced = "ADVANCED"
+}
+
+enum Goal: String {
+    case looseWeight = "LOOSE_WEIGHT"
+    case buildMuscle = "BUILD_MUSCLE"
+    case stayFit = "STAY_FIT"
+    case improveFlexibility = "IMPROVE_FLEXIBILITY"
+}
+
+
 struct OnboardingData {
     
     var age: Int?
-    var gender: String?
+    var gender: Gender?
     var height: Int?
     var weight: Int?
-    var activity: String?
-    var goal: String?
+    var activity: ActivityLevel?
+    var goal: Goal?
 }

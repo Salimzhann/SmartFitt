@@ -22,10 +22,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let hasOnboarding = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
         let hasToken = !(TokenStorage.shared.getAccessToken()?.isEmpty ?? true)
 
-        if !hasOnboarding {
-            showOnboarding()
-        } else if !hasToken {
+        if !hasToken {
             showAuth()
+        } else if !hasOnboarding {
+            showOnboarding()
         } else {
             showMain()
         }
@@ -35,7 +35,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     private func showOnboarding() {
+        let onboardingRepo = HelperOnboardingRepository()
         let vc = HelperOnboardingViewController()
+        let onboardingPresenter = HelperOnboardingPresenter(
+            repository: onboardingRepo,
+            view: vc
+        )
+        vc.presenter = onboardingPresenter
         window?.rootViewController = vc
     }
 

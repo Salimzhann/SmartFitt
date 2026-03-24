@@ -114,7 +114,7 @@ extension Step1View: OnboardingStep {
     func getData() -> Any {
         return Step1Data(
             age: selectedAge,
-            gender: genderSegment.selectedSegmentIndex == 0 ? "male" : "female"
+            gender: genderSegment.selectedSegmentIndex == 0 ? "MALE" : "FEMALE"
         )
     }
 }

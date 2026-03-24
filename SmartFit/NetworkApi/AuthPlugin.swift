@@ -7,6 +7,7 @@
 
 import Moya
 import UIKit
+import Alamofire
 import Foundation
 
 
@@ -47,36 +48,56 @@ final class NetworkManager {
 
             switch result {
             case .success(let response):
-
+                
+                print("➡️ [\(target.path)] STATUS:", response.statusCode)
+                
                 // ❌ 401 НА AUTH — ВОЗВРАЩАЕМ ОШИБКУ
                 if response.statusCode == 401, target.isAuthEndpoint {
                     completion(.failure(response.mapAPIError()))
                     return
                 }
-
+                
                 // 🔄 401 НА ОБЫЧНЫХ ЗАПРОСАХ
                 if response.statusCode == 401 {
+                    print("""
+                    🟠 UNAUTHORIZED (401)
+                    🔵 [\(target.method.rawValue)] \(target.path)
+                    """)
+                    
                     self.enqueue {
                         self.request(target, completion: completion)
                     }
                     self.refreshIfNeeded()
                     return
                 }
-
+                
                 // ✅ SUCCESS
                 if (200...299).contains(response.statusCode) {
                     do {
-                        print(String(data: response.data, encoding: .utf8) ?? "NO JSON")
+                        print("📦 RESPONSE:", String(data: response.data, encoding: .utf8) ?? "NO JSON")
                         let decoded = try makeJSONDecoder().decode(T.self, from: response.data)
                         completion(.success(decoded))
                     } catch {
                         completion(.failure(error))
                     }
                 } else {
+                    print("""
+                       🔴 ERROR RESPONSE
+                       🔵 [\(target.method.rawValue)] \(target.path)
+                       📊 STATUS: \(response.statusCode)
+                       📦 BODY: \(String(data: response.data, encoding: .utf8) ?? "NO JSON")
+                       """)
+                    
                     completion(.failure(response.mapAPIError()))
                 }
-
+                
             case .failure(let error):
+                print("""
+                🔴 NETWORK ERROR
+                🔵 [\(target.method.rawValue)] \(target.path)
+                ❗️ ERROR: \(error.localizedDescription)
+                """)
+                
                 completion(.failure(error))
             }
         }
@@ -86,16 +107,41 @@ final class NetworkManager {
         _ target: NetworkAPI,
         completion: @escaping (Result<Void, Error>) -> Void
     ) {
-        provider.request(target) { result in
+        provider.request(target) { [weak self] result in
+            guard let self else { return }
+
             switch result {
             case .success(let response):
-                if (200...299).contains(response.statusCode) {
+                
+                let statusCode = response.statusCode
+                let body = String(data: response.data, encoding: .utf8) ?? "NO BODY"
+                
+                print("📊 STATUS:", statusCode)
+                print("📦 BODY:", body)
+                
+                // ❌ 401 на auth
+                if statusCode == 401, target.isAuthEndpoint {
+                    completion(.failure(self.makeError(statusCode: statusCode, body: body)))
+                    return
+                }
+
+                // 🔄 401 → refresh
+                if statusCode == 401 {
+                    self.enqueue {
+                        self.requestWithoutDecoding(target, completion: completion)
+                    }
+                    self.refreshIfNeeded()
+                    return
+                }
+
+                if (200...299).contains(statusCode) {
                     completion(.success(()))
                 } else {
-                    completion(.failure(response.mapAPIError()))
+                    completion(.failure(self.makeError(statusCode: statusCode, body: body)))
                 }
 
             case .failure(let error):
+                print("❌ NETWORK ERROR:", error)
                 completion(.failure(error))
             }
         }
@@ -170,5 +216,15 @@ final class NetworkManager {
                 window.makeKeyAndVisible()
             }
         }
+    }
+    
+    private func makeError(statusCode: Int, body: String) -> NSError {
+        return NSError(
+            domain: "API_ERROR",
+            code: statusCode,
+            userInfo: [
+                NSLocalizedDescriptionKey: "Status: \(statusCode)\n\(body)"
+            ]
+        )
     }
 }

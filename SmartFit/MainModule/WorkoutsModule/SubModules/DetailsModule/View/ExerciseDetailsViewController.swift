@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import Kingfisher
 import SafariServices
 
 protocol IExerciseDetailsView: AnyObject {
@@ -264,9 +265,13 @@ final class ExerciseDetailsViewController: UIViewController, IExerciseDetailsVie
         hintLabel.text = "Watch on YouTube"
 
         if let thumb = YouTubeHelper.thumbnailURL(from: url) {
-            loadImage(from: thumb) { [weak self] image in
-                self?.previewImageView.image = image
-            }
+            previewImageView.kf.setImage(
+                with: thumb,
+                options: [
+                    .transition(.fade(0.2)),
+                    .cacheOriginalImage
+                ]
+            )
         } else {
             previewImageView.image = nil
         }
