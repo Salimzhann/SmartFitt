@@ -356,21 +356,14 @@ extension LoginViewController: ILoginViewController {
               let window = scene.windows.first else {
             return
         }
-        
-        let hasOnboarding = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
-        
-        if hasOnboarding {
-            window.rootViewController = MainTabBarController()
-        } else {
-            let view = HelperOnboardingViewController()
-            let onboardingRepo = HelperOnboardingRepository()
-            let onboardingPresenter = HelperOnboardingPresenter(
-                repository: onboardingRepo,
-                view: view
-            )
-            view.presenter = onboardingPresenter
-            window.rootViewController = view
-        }
+        let view = HelperOnboardingViewController()
+        let onboardingRepo = HelperOnboardingRepository()
+        let onboardingPresenter = HelperOnboardingPresenter(
+            repository: onboardingRepo,
+            view: view
+        )
+        view.presenter = onboardingPresenter
+        window.rootViewController = view
         
         window.makeKeyAndVisible()
     }

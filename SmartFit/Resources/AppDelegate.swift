@@ -26,8 +26,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         if !hasToken {
             showAuth()
-        } else if !hasOnboarding {
-            showOnboarding()
         } else {
             showMain()
         }
