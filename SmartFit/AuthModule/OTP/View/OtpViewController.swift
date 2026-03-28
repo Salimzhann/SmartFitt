@@ -254,8 +254,21 @@ extension OtpViewController: IOtpViewController {
             return
         }
         
-        let tabBarController = MainTabBarController()
-        window.rootViewController = tabBarController
+        let hasOnboarding = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
+        
+        if hasOnboarding {
+            window.rootViewController = MainTabBarController()
+        } else {
+            let view = HelperOnboardingViewController()
+            let onboardingRepo = HelperOnboardingRepository()
+            let onboardingPresenter = HelperOnboardingPresenter(
+                repository: onboardingRepo,
+                view: view
+            )
+            view.presenter = onboardingPresenter
+            window.rootViewController = view
+        }
+        
         window.makeKeyAndVisible()
     }
 }
