@@ -23,6 +23,7 @@ final class NutritionResultViewController: UIViewController {
         let label = UILabel()
         label.text = "Analyzing food..."
         label.font = .systemFont(ofSize: 22, weight: .semibold)
+        label.numberOfLines = 0
         label.textAlignment = .center
         return label
     }()

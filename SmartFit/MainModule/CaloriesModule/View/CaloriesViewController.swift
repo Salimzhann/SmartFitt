@@ -292,6 +292,7 @@ extension CaloriesViewController: ICaloriesView {
             let label = UILabel()
             label.textColor = .secondaryLabel
             label.font = .systemFont(ofSize: 18, weight: .regular)
+            label.numberOfLines = 0
             label.text = meal.name + " - \(meal.kcal) Kcal"
             mealsStackView.addArrangedSubview(label)
         }

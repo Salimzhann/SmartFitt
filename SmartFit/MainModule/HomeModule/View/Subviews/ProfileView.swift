@@ -15,6 +15,7 @@ final class ProfileView: UIView {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
         imageView.clipsToBounds = true
+        imageView.isUserInteractionEnabled = true
         return imageView
     }()
     private let usernameLabel: UILabel = {
@@ -40,6 +41,7 @@ final class ProfileView: UIView {
     private lazy var stackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [usernameLabel, emailLabel])
         stackView.axis = .vertical
+        stackView.isUserInteractionEnabled = true
         stackView.alignment = .leading
         stackView.spacing = 0
         return stackView
@@ -53,12 +55,15 @@ final class ProfileView: UIView {
     }
     
     private var shimmerKey = "shimmer"
+    
     var onLogOut: (() -> Void)?
+    var onProfileTapped: (() -> Void)?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
         setupSkeleton()
+        setupTapActions()
     }
     
     required init?(coder: NSCoder) {
@@ -170,5 +175,17 @@ final class ProfileView: UIView {
         skeletonViews.forEach {
             $0.layer.removeAnimation(forKey: shimmerKey)
         }
+    }
+    
+    private func setupTapActions() {
+        let imageTap = UITapGestureRecognizer(target: self, action: #selector(handleTap))
+        imageView.addGestureRecognizer(imageTap)
+
+        let stackTap = UITapGestureRecognizer(target: self, action: #selector(handleTap))
+        stackView.addGestureRecognizer(stackTap)
+    }
+    
+    @objc private func handleTap() {
+        onProfileTapped?()
     }
 }

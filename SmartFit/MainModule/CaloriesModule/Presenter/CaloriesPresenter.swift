@@ -48,6 +48,10 @@ final class CaloriesPresenter: ICaloriesPresenter {
     }
 
     private func updateUI() {
+        guard !days.isEmpty,
+              currentIndex >= 0,
+              currentIndex < days.count else { return }
+
         let model = days[currentIndex]
 
         view?.showCalories(

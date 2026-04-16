@@ -25,6 +25,20 @@ final class HomeViewController: UIViewController, IHomeViewController {
         view.onLogOut = { [weak presenter] in
             presenter?.logoutTapped()
         }
+        view.onProfileTapped = { [weak self] in
+            let profileRepo = ProfileRepository()
+            let profileVC = ProfileViewController()
+            let profilePresenter = ProfilePresenter(
+                view: profileVC,
+                repository: profileRepo
+            )
+            profileVC.presenter = profilePresenter
+            profileVC.hidesBottomBarWhenPushed = true
+            profileVC.title = "Profile"
+            
+            self?.navigationController?.setNavigationBarHidden(false, animated: true)
+            self?.navigationController?.pushViewController(profileVC, animated: true)
+        }
         return view
     }()
     private let scrollView = UIScrollView()
@@ -77,6 +91,11 @@ final class HomeViewController: UIViewController, IHomeViewController {
         navigationController?.setNavigationBarHidden(true, animated: false)
         setupViews()
         profileView.showSkeleton()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: true)
     }
     
     private func setupViews() {
