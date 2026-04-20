@@ -7,14 +7,19 @@
 
 import UIKit
 import SnapKit
+import SafariServices
 
 protocol IProfileView: AnyObject {
     
     var presenter: IProfilePresenter? { get set }
+    
+    func showLoading()
+    func hideLoading()
+    func showInfo(data: ProfileResponse)
 }
 
 
-class ProfileViewController: UIViewController, IProfileView {
+class ProfileViewController: UIViewController {
     
     private let imageView: UIImageView = {
         let imageView = UIImageView()
@@ -26,7 +31,6 @@ class ProfileViewController: UIViewController, IProfileView {
     private let emailLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 16, weight: .regular)
-        label.text = "manassalimzhan04@gmail.com"
         label.textAlignment = .center
         return label
     }()
@@ -46,7 +50,6 @@ class ProfileViewController: UIViewController, IProfileView {
     }()
     private let weeklyCaloriesResultLabel: UILabel = {
         let label = UILabel()
-        label.text = "9234/10000 cal"
         label.font = .systemFont(ofSize: 14, weight: .bold)
         label.textAlignment = .center
         return label
@@ -102,22 +105,18 @@ class ProfileViewController: UIViewController, IProfileView {
         label.font = .systemFont(ofSize: 14, weight: .semibold)
         return label
     }()
-    private lazy var heightValueView: UIView = {
+    private let heightValueView: UILabel = {
         let label = UILabel()
-        label.text = "180 cm"
         label.font = .systemFont(ofSize: 14, weight: .bold)
-        
-        let contentView = wrapperView(contentView: label, insets: .init(top: 10, left: 10, bottom: 10, right: 10))
-        return contentView
+        return label
     }()
-    private lazy var weightValueView: UIView = {
+    private lazy var heightWrappedView = wrapperView(contentView: heightValueView, insets: .init(top: 10, left: 10, bottom: 10, right: 10))
+    private lazy var weightValueView: UILabel = {
         let label = UILabel()
-        label.text = "80 kg"
         label.font = .systemFont(ofSize: 14, weight: .bold)
-        
-        let contentView = wrapperView(contentView: label, insets: .init(top: 10, left: 10, bottom: 10, right: 10))
-        return contentView
+        return label
     }()
+    private lazy var weightWrappedView = wrapperView(contentView: weightValueView, insets: .init(top: 10, left: 10, bottom: 10, right: 10))
     private lazy var logOutButton: UIButton = {
         let button = UIButton(type: .system)
         let image = UIImage(systemName: "rectangle.portrait.and.arrow.right")
@@ -136,13 +135,65 @@ class ProfileViewController: UIViewController, IProfileView {
         
         return button
     }()
+    private let lockImageView: UIImageView = {
+        let image = UIImageView(image: UIImage(systemName: "lock.shield"))
+        image.contentMode = .scaleAspectFit
+        return image
+    }()
+    private let privacyPolicyLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Privacy Policy"
+        label.font = .systemFont(ofSize: 14, weight: .semibold)
+        return label
+    }()
+    private let rightChevronImageView: UIImageView = {
+        let image = UIImageView(image: UIImage(systemName: "chevron.right"))
+        image.contentMode = .scaleAspectFit
+        return image
+    }()
+    private lazy var privacyPolicyContentView: UIView = {
+        let view = UIView()
+        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(termsButtonTapped)))
+        
+        view.addSubview(lockImageView)
+        lockImageView.snp.makeConstraints { make in
+            make.top.bottom.equalToSuperview().inset(12)
+            make.leading.equalToSuperview()
+            make.size.equalTo(24)
+        }
+        
+        view.addSubview(privacyPolicyLabel)
+        privacyPolicyLabel.snp.makeConstraints { make in
+            make.centerY.equalToSuperview()
+            make.leading.equalTo(lockImageView.snp.trailing).offset(12)
+        }
+        
+        view.addSubview(rightChevronImageView)
+        rightChevronImageView.snp.makeConstraints { make in
+            make.centerY.equalToSuperview()
+            make.trailing.equalToSuperview()
+        }
+        
+        return view
+    }()
+    private let loadingView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .white
+        view.isHidden = true
+        return view
+    }()
+
+    private let activityIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.hidesWhenStopped = true
+        return indicator
+    }()
     
     var presenter: IProfilePresenter?
     
     override func viewDidLoad() {
         presenter?.viewDidLoad()
         setupViews()
-        setupMacros()
     }
     
     private func setupViews() {
@@ -204,8 +255,8 @@ class ProfileViewController: UIViewController, IProfileView {
             make.leading.equalToSuperview().inset(16)
         }
         
-        view.addSubview(heightValueView)
-        heightValueView.snp.makeConstraints { make in
+        view.addSubview(heightWrappedView)
+        heightWrappedView.snp.makeConstraints { make in
             make.centerY.equalTo(heightLabel)
             make.trailing.equalToSuperview().inset(16)
         }
@@ -216,8 +267,8 @@ class ProfileViewController: UIViewController, IProfileView {
             make.leading.equalToSuperview().inset(16)
         }
         
-        view.addSubview(weightValueView)
-        weightValueView.snp.makeConstraints { make in
+        view.addSubview(weightWrappedView)
+        weightWrappedView.snp.makeConstraints { make in
             make.centerY.equalTo(weightLabel)
             make.trailing.equalToSuperview().inset(16)
         }
@@ -228,27 +279,43 @@ class ProfileViewController: UIViewController, IProfileView {
             make.leading.trailing.equalToSuperview().inset(16)
             make.height.equalTo(44)
         }
+        
+        view.addSubview(privacyPolicyContentView)
+        privacyPolicyContentView.snp.makeConstraints { make in
+            make.bottom.equalTo(logOutButton.snp.top).offset(-16)
+            make.leading.trailing.equalToSuperview().inset(16)
+        }
+        
+        view.addSubview(loadingView)
+        loadingView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+
+        loadingView.addSubview(activityIndicator)
+        activityIndicator.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
     }
     
-    private func setupMacros() {
+    private func setupMacros(protein: Double, carbs: Double, fats: Double) {
         let protein = MacroView(
             title: "Protein",
-            value: "420 g / 560 g",
-            progress: 420.0 / 560.0,
+            value: "\(protein) g / 560 g",
+            progress: Float(protein) / 560.0,
             color: .systemGreen
         )
         
         let carbs = MacroView(
             title: "Carbs",
-            value: "980 g / 1200 g",
-            progress: 980.0 / 1200.0,
+            value: "\(carbs) g / 1200 g",
+            progress: Float(carbs) / 1200.0,
             color: .systemBlue
         )
         
         let fats = MacroView(
             title: "Fats",
-            value: "500 g / 420 g",
-            progress: min(500.0 / 420.0, 1.0),
+            value: "\(fats) g / 420 g",
+            progress: min(Float(fats) / 420.0, 1.0),
             color: .systemOrange
         )
         
@@ -271,5 +338,43 @@ class ProfileViewController: UIViewController, IProfileView {
     
     @objc private func logoutButtonTapped() {
         presenter?.logoutTapped()
+    }
+    
+    @objc private func termsButtonTapped() {
+        guard let url = URL(
+            string: "https://terms-and-conditions-mobile.vercel.app/"
+        ) else { return }
+        
+        let safariVC = SFSafariViewController(url: url)
+        safariVC.modalPresentationStyle = .pageSheet
+        present(safariVC, animated: true)
+    }
+}
+
+
+extension ProfileViewController: IProfileView {
+    
+    func showLoading() {
+        loadingView.isHidden = false
+        activityIndicator.startAnimating()
+        view.isUserInteractionEnabled = false
+    }
+
+    func hideLoading() {
+        loadingView.isHidden = true
+        activityIndicator.stopAnimating()
+        view.isUserInteractionEnabled = true
+    }
+    
+    func showInfo(data: ProfileResponse) {
+        emailLabel.text = data.userEmail
+        weeklyCaloriesResultLabel.text = "\(data.weekNutrition.totalKcal) kcal"
+        heightValueView.text = "\(data.height) cm"
+        weightValueView.text = "\(data.height) kg"
+        setupMacros(
+            protein: data.weekNutrition.totalProtein,
+            carbs: data.weekNutrition.totalCarbs,
+            fats: data.weekNutrition.totalFats
+        )
     }
 }

@@ -10,14 +10,14 @@ import Foundation
 
 protocol IProfileRepository {
     
-    func infoAboutMe(completion: @escaping (Result<MeResponse, Error>) -> Void)
+    func infoAboutMe(completion: @escaping (Result<ProfileResponse, Error>) -> Void)
 }
 
 
 final class ProfileRepository: IProfileRepository {
 
-    func infoAboutMe(completion: @escaping (Result<MeResponse, Error>) -> Void) {
-        NetworkManager.shared.request(.infoMe, completion: completion)
+    func infoAboutMe(completion: @escaping (Result<ProfileResponse, Error>) -> Void) {
+        NetworkManager.shared.request(.fetchProfile, completion: completion)
     }
 }
 

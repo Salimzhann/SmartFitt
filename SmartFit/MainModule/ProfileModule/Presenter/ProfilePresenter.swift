@@ -24,7 +24,9 @@ class ProfilePresenter: IProfilePresenter {
         self.repository = repository
     }
     
-    func viewDidLoad() { }
+    func viewDidLoad() {
+        fetchUserInfo()
+    }
     
     func logoutTapped() {
         TokenStorage.shared.clear()
@@ -38,6 +40,19 @@ class ProfilePresenter: IProfilePresenter {
                 
                 window.rootViewController = nav
                 window.makeKeyAndVisible()
+            }
+        }
+    }
+    
+    private func fetchUserInfo() {
+        self.view?.showLoading()
+        repository.infoAboutMe { [weak self] response in
+            switch response {
+            case .failure(let error):
+                print(error)
+            case .success(let response):
+                self?.view?.hideLoading()
+                self?.view?.showInfo(data: response)
             }
         }
     }

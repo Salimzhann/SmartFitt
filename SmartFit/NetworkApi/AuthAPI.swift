@@ -37,6 +37,9 @@ enum NetworkAPI {
     
     // Onboarding
     case onboarding(data: OnboardingData)
+    
+    // Profile
+    case fetchProfile
 }
 
 extension NetworkAPI: TargetType {
@@ -73,6 +76,9 @@ extension NetworkAPI: TargetType {
             
             // Onboarding
         case .onboarding:                                   return "/api/v1/auth/onbording"
+            
+            // Profile
+        case .fetchProfile:                                 return "/api/v1/auth/me/profile"
         }
     }
 
@@ -83,7 +89,8 @@ extension NetworkAPI: TargetType {
              .fetchExercisesList,
              .fetchExerciseDetails,
              .fetchChatHistory,
-             .fetchCalories:
+             .fetchCalories,
+             .fetchProfile:
             return .get
         case .deleteChatHistory:
             return .delete
@@ -157,7 +164,8 @@ extension NetworkAPI: TargetType {
              .fetchExerciseDetails,
              .fetchChatHistory,
              .deleteChatHistory,
-             .fetchCalories:
+             .fetchCalories,
+             .fetchProfile:
             return .requestPlain
         }
     }
